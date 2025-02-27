@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "VMC",
-  description: "VMC",
+  title: "MOVEMENT COIN",
+  description: "MOVEMENT COIN",
 };
 
 export default async function HomeLayout({ children }: Readonly<{
