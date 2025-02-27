@@ -6,11 +6,11 @@ export const TabSection = styled.div`
   padding: 0 2.5rem;
 
   @media (min-width: 768px) {
-    width: 66.666667%; // md:w-8/12
+    width: 61%; // md:w-8/12
   }
 
   @media (min-width: 1024px) {
-    width: 66.666667%; // lg:w-8/12
+    width: 60%; // lg:w-8/12
   }
 
   @media (max-width: 640px) {
@@ -20,11 +20,11 @@ export const TabSection = styled.div`
 
 export const TabMetricsSection = styled(TabSection)`
   @media (min-width: 768px) {
-    width: 33.333333%; // md:w-4/12
+    width: 40%; // md:w-4/12
   }
 
   @media (min-width: 1024px) {
-    width: 33.333333%; // lg:w-4/12
+    width: 40%; // lg:w-4/12
   }
 `;
 
@@ -40,7 +40,7 @@ export const TabFlex = styled.div`
 
 export const TabText = styled.p<{ isActive?: boolean }>`
   margin-bottom: 0.75rem;
-  margin-right: 1.25rem;
+  margin-right: 5.25rem;
   color: white;
   font-size: 1.125rem;
   font-weight: normal;

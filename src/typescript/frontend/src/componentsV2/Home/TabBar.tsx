@@ -16,7 +16,7 @@ const TabBar = (): JSX.Element => {
       <TabMetricsSection>
         <TabGroup>
           <TabFlex>
-            <TabText isActive>LAST SWAP</TabText>
+            <TabText isActive className="mr-10">LAST SWAP</TabText>
             <TabText isActive>MKT CAP</TabText>
           </TabFlex>
         </TabGroup>
