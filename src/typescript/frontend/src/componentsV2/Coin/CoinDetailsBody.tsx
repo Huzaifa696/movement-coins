@@ -68,7 +68,7 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
           <StyledImage src="/images/coin/match2.png" />
         </div>
         <div className="flex negative-margin justify-end mb-5 px-2 md:px-0 w-full z-1">
-          <span  onClick={() => setShowInfo(!showInfo)}>
+          <span  onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
             <StyledImage src="/images/coin/info.png" />
           </span>
         </div>
