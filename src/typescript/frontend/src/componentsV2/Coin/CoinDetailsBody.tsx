@@ -75,7 +75,7 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
         {showInfo ? (
           <div className="flex w-full flex-wrap px-2 md:px-0 items-center justify-end">
             <div className="box-show px-5 py-3 rounded-full max-content text-white">
-              1% of every trade goes to Greenpeace
+              1% of every trade goes to Project Zero’s
             </div>
 
             <a href="#" onClick={() => setShowInfo(false)}>
