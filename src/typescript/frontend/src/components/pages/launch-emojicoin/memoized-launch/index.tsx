@@ -32,19 +32,23 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
     title: "",
     description: "",
     image: "",
+    nonProfitName: "",
+    nonProfitDescription: "",
+    nonProfitImage: "",
+    nonProfitLink: "",
   });
 
   const { registerMarket, cost } = useRegisterMarket();
   const { invalid: isEmojiSelected, registered } = useIsMarketRegistered();
 
-  const isValidImageURL = useCallback(() => {
+  const isValidImageURL = useCallback((url: string) => {
     try {
-      new URL(launchCoinData.image);
+      new URL(url);
       return true;
     } catch (e) {
       return false;
     }
-  }, [launchCoinData.image]);
+  }, []);
 
   const validateCoinData = useCallback(() => {
     return (
@@ -52,7 +56,12 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
       launchCoinData.title &&
       launchCoinData.description &&
       launchCoinData.image &&
-      isValidImageURL()
+      isValidImageURL(launchCoinData.image) &&
+      launchCoinData.nonProfitName &&
+      launchCoinData.nonProfitDescription &&
+      launchCoinData.nonProfitImage &&
+      isValidImageURL(launchCoinData.nonProfitImage) &&
+      launchCoinData.nonProfitLink
     );
   }, [
     isEmojiSelected,
@@ -60,6 +69,10 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
     launchCoinData?.description,
     launchCoinData?.image,
     isValidImageURL,
+    launchCoinData?.nonProfitName,
+    launchCoinData?.nonProfitDescription,
+    launchCoinData?.nonProfitImage,
+    launchCoinData?.nonProfitLink,
   ]);
 
   const invalid = !validateCoinData();
@@ -127,6 +140,9 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
                 inputGroupProps={{ label: "Select Emojis", scale: "xm" }}
               />
 
+              <h3 className="body-md text-light-gray md:body-lg uppercase font-forma my-4">
+                Coin Details
+              </h3>
               {/* Title Input */}
               <input
                 type="text"
@@ -155,6 +171,55 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
                   setLaunchCoinData({ ...launchCoinData, description: e.target.value })
                 }
               />
+
+              {/* Non-Profit Name Input */}
+              <div className="flex flex-col mt-4">
+                <h3 className="body-md text-light-gray md:body-lg uppercase font-forma my-4">
+                  Non-Profit Details
+                </h3>
+                <input
+                  type="text"
+                  placeholder="Enter Non-Profit Name"
+                  className="p-3 !border !border-solid !border-light-gray rounded-md"
+                  value={launchCoinData.nonProfitName}
+                  onChange={(e) =>
+                    setLaunchCoinData({ ...launchCoinData, nonProfitName: e.target.value })
+                  }
+                />
+
+                {/* Non-Profit Description Input */}
+                <textarea
+                  placeholder="Enter Non-Profit Description"
+                  className="mt-4 p-3 !border !border-solid !border-light-gray rounded-md"
+                  rows={3}
+                  value={launchCoinData.nonProfitDescription}
+                  onChange={(e) =>
+                    setLaunchCoinData({ ...launchCoinData, nonProfitDescription: e.target.value })
+                  }
+                />
+
+                {/* Non-Profit Image Input */}
+                <input
+                  type="text"
+                  placeholder="Enter Non-Profit Image URL"
+                  className="mt-4 p-3 !border !border-solid !border-light-gray rounded-md"
+                  value={launchCoinData.nonProfitImage}
+                  onChange={(e) =>
+                    setLaunchCoinData({ ...launchCoinData, nonProfitImage: e.target.value })
+                  }
+                />
+
+                {/* Non-Profit Link Input */}
+                <input
+                  type="text"
+                  placeholder="Enter Non-Profit Link"
+                  className="mt-4 p-3 !border !border-solid !border-light-gray rounded-md"
+                  value={launchCoinData.nonProfitLink}
+                  onChange={(e) =>
+                    setLaunchCoinData({ ...launchCoinData, nonProfitLink: e.target.value })
+                  }
+                />
+              </div>
             </div>
           </div>
           <MarketValidityIndicator

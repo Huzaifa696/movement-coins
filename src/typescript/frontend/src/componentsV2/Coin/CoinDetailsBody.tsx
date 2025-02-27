@@ -6,6 +6,7 @@ import { type GridProps } from "components/pages/emojicoin/types";
 import ProgressBar from "./ProgressBar";
 import MarketCard from "./MarketCard";
 import SwapComponentV2 from "components/pages/emojicoin/components/trade-emojicoin/SwapComponentV2";
+import { type CoinsList } from "@prisma/client";
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -38,16 +39,21 @@ const MainContent = styled.div`
   }
 `;
 
-const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element => {
+const CoinDetailsBody = (props: GridProps & { coinDetails?: CoinsList | null }): JSX.Element => {
   const [showInfo, setShowInfo] = useState(false);
+
+  const coinImage = props.coinDetails?.meta?.imageURL ?? "/images/coin/match1.png";
+  const nonProfitImage = props.coinDetails?.meta?.nonProfitImageURL ?? "/images/coin/match1.png";
+  const nonProfitName = props.coinDetails?.meta?.nonProfitName ?? "";
+
   return (
     <div className="container px-4">
-      <ContentWrapper >
+      <ContentWrapper>
         <SideImageContainer>
           <StyledImage
-            src={props.coinImage ?? "/images/coin/match1.png"}
+            src={coinImage}
             style={{
-              ...(props.coinImage && {
+              ...(props.coinDetails?.meta?.imageURL && {
                 clipPath: "circle(45%)",
               }),
               zIndex: 1,
@@ -65,7 +71,15 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
         </MainContent>
 
         <div className="w-full flex justify-center items-center px-10 sm-px-10 md:w-3/12 lg:w-3/12">
-          <StyledImage src="/images/coin/match2.png" />
+          <StyledImage
+            src={nonProfitImage}
+            style={{
+              ...(props.coinDetails?.meta?.nonProfitImageURL && {
+                clipPath: "circle(45%)",
+              }),
+              zIndex: 1,
+            }}
+          />
         </div>
         <div className="flex negative-margin justify-end mb-5 px-2 md:px-0 w-full z-1">
           <span onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
@@ -75,7 +89,7 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
         {showInfo ? (
           <div className="flex w-full flex-wrap px-2 md:px-0 items-center justify-end">
             <div className="box-show px-5 py-3 rounded-full max-content text-white">
-              1% of every trade goes to Project Zero’s
+              1% of every trade goes to {nonProfitName}
             </div>
 
             <a href="#" onClick={() => setShowInfo(false)}>

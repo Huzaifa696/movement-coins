@@ -234,7 +234,7 @@ export default function SwapComponentV2({
           </h6>
         </MatchBox>
       </DetailBox>
-      <GreenpeaceText>Project Zero’s Receives: 0.1</GreenpeaceText>
+      {/* <GreenpeaceText>Project Zero’s Receives: 0.1</GreenpeaceText> */}
       <div className="w-full flex justify-center sm-mb-5 z-10">
         <SwapButtonV2
           inputAmount={inputAmount}

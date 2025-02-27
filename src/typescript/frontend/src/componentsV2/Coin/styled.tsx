@@ -26,6 +26,8 @@ export const CoinDescription = styled.p`
   line-height: 35px !important;
   letter-spacing: 0% !important;
   text-align: center !important;
+  max-width: 900px;
+  overflow-wrap: break-word;
 `;
 
 export const CoinDescriptionSpan = styled.span`
