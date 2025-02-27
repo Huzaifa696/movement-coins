@@ -158,7 +158,7 @@ const ClientEmojicoinPageV2 = (props: EmojicoinProps2) => {
         <CoinDetailsHeader />
         <CoinDetailsBody data={props.data} coinImage={props?.data?.coinImage} />
       </div>
-      <div className="container mx-auto px-4 mt-16">
+      {/* <div className="container mx-auto px-4 mt-16">
         <Chart
           title={formatEmojiNameThroughSlug(name ?? "")}
           data={
@@ -173,7 +173,7 @@ const ClientEmojicoinPageV2 = (props: EmojicoinProps2) => {
           }
           height={400}
         />
-      </div>
+      </div> */}
     </>
   );
 };
