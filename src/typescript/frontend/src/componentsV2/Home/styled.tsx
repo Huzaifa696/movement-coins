@@ -29,7 +29,7 @@ export const TabMetricsSection = styled(TabSection)`
 `;
 
 export const TabGroup = styled.div`
-  padding: 0 2.5rem;
+  padding: 0 1.7rem;
   animation: fadeInUp;
   animation-delay: 0.1s;
 `;
@@ -39,11 +39,13 @@ export const TabFlex = styled.div`
 `;
 
 export const TabText = styled.p<{ isActive?: boolean }>`
-  margin-bottom: 0.75rem;
-  margin-right: 5.25rem;
+font-family: Lora;
+font-weight: 700;
+font-size: 15px;
+line-height: 19.2px;
+letter-spacing: 0%;
+  margin-right: 4rem;
   color: white;
-  font-size: 1.125rem;
-  font-weight: normal;
   opacity: ${(props) => (props.isActive ? 1 : 0.5)};
 
   @media (max-width: 640px) {

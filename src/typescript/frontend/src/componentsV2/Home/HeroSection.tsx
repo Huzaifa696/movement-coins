@@ -9,6 +9,7 @@ import { useInterval } from "react-use";
 import { useUsdMarketCap } from "@hooks/use-usd-market-cap";
 import { FormattedNumber } from "components/FormattedNumber";
 import Link from "next/link";
+import HeroCoinImage from "./HeroCoinImage";
 
 const FEATURED_MARKET_INTERVAL = 5 * 1000;
 const MAX_NUM_FEATURED_MARKETS = 5;
@@ -55,10 +56,7 @@ const HeroSection: React.FC<MainCardPropsV2> = (props): JSX.Element => {
           className="wow fadeInUp group"
           data-wow-delay=".1s"
         >
-          <StyledImage
-            src={featured?.coinMeta?.imageURL ?? "/images/home/banner-circle.png"}
-            className={`cursor-pointer  ${featured?.coinMeta?.imageURL ? "[clip-path:circle(45%)]" : ""}`}
-          />
+          <HeroCoinImage coinImage={featured?.coinMeta?.imageURL} coinTitle={featured?.coinMeta?.title} nonProfitImage={featured?.coinMeta?.nonProfitImageURL}/>
         </Link>
       </div>
       <div className="w-full px-10 sm-px-10 md:w-1/2 w60-box">

@@ -2,6 +2,7 @@
 import { type SymbolEmojiData } from "@sdk/emoji_data";
 import { StyledImage } from "components/image/styled";
 import { EmojiMarketPageLinkV2 } from "components/pages/home/components/table-card/LinkOrAnimationTriggerV2";
+import Image from "next/image";
 import Link from "next/link";
 import { ROUTES } from "router/routes";
 
@@ -15,6 +16,7 @@ interface CoinCardProps {
   emojis: Array<SymbolEmojiData>;
   imageURL?: string;
   titleSlug: string;
+  nonProfit?: string;
 }
 
 const formatTimeAgo = (timestamp: number): string => {
@@ -70,27 +72,37 @@ const CoinCard: React.FC<CoinCardProps> = ({
   description,
   imageURL,
   titleSlug,
+  nonProfit,
 }) => {
   const timeAgo = formatTimeAgo(time);
   const formattedValue = formatValue(value ?? 0n);
 
   return (
     <Link href={`${ROUTES.coin}/${titleSlug}`}>
-      <div className="box-show cursor-pointer px-5 mt-12 py-5 flex-box items-center rounded-full round w-full">
-        <div className="flex items-center mr-5 sm-mb">
-          <StyledImage
-            className="box-img"
-            src={imageURL ?? "/images/home/box-cir.png"}
-            style={{
-              // ...(imageURL && {
-              //   clipPath: "circle(45%)",
-              // }),
-            }}
-            width={150}
-            height={150}
-          />
+      <div className="cursor-pointer p-5 flex-box items-center rounded-full round w-full bg-white/[0.04] shadow-[0px_19.85px_44.66px_0px_#00000026] border-2 border-[#FFFFFF80] border-solid">
+        <div className="relative">
+          <div className=" relative mr-10 w-[130px] h-[130px] rounded-full border-2 border-white/50 bg-white/[0.04] shadow-[0px_19.85px_44.66px_0px_#00000026] backdrop-blur-[11.58px] border-solid">
+            <Image
+              src={imageURL || ""}
+              alt={titleSlug || ""}
+              width={94}
+              height={94}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[94px] h-[94px] rounded-full border-[1.5px] border-white/50 shadow-[0px_19.85px_44.66px_0px_#00000026] border-solid object-cover"
+              priority
+            />
+            <div className="absolute bottom-0 -right-[24px] w-[78px] h-[78px] rounded-full border-2 border-white/50 bg-white/[0.04] shadow-[0px_19.85px_44.66px_0px_#00000026] backdrop-blur-[11.58px] border-solid">
+              <Image
+                src={nonProfit || ""}
+                alt={titleSlug || ""}
+                width={56}
+                height={56}
+                className="w-[56px] h-[56px] rounded-full border-[1.5px] border-white/50 object-cover border-solid absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                priority
+              />
+            </div>
+          </div>
         </div>
-        <div className="w50-box">
+        <div className=" w-[51%]">
           <div className="flex mb-5">
             <div className="mr-3" style={{ width: "20px" }}>
               <StyledImage src="/images/home/fire.png" />
@@ -100,15 +112,15 @@ const CoinCard: React.FC<CoinCardProps> = ({
             </div>
           </div>
           <h1 className="mb-3 main-title-sm text-white dark:text-white">{title ?? "-"}</h1>
-          <p className="text-white text-sm w50-box font-light">
+          <p className="text-white font-lora font-normal text-[16px] leading-[18.19px] tracking-[0%]">
             {description ?? "No description available"}
           </p>
         </div>
-        <div style={{ marginRight: "8rem", marginLeft: "4rem" }}>
-          <h5 className="mb-3 main-title-sm-2 text-white dark:text-white">{timeAgo}</h5>
+        <div className="w-[150px]">
+          <h5 className="main-title-sm-2 text-white dark:text-white">{timeAgo}</h5>
         </div>
         <div>
-          <h5 className="mb-3 main-title-sm-2 text-white dark:text-white">{formattedValue}</h5>
+          <h5 className="main-title-sm-2 text-white dark:text-white">{formattedValue}</h5>
         </div>
       </div>
     </Link>

@@ -9,7 +9,7 @@ const TabBar = (): JSX.Element => {
         <TabGroup>
           <TabFlex>
             <TabText isActive>ALL COINS</TabText>
-            <TabText>MORE TO COME...</TabText>
+            {/* <TabText>MORE TO COME...</TabText> */}
           </TabFlex>
         </TabGroup>
       </TabSection>
