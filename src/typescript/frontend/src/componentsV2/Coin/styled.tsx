@@ -5,6 +5,8 @@ export const HeaderContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 9999;
 `;
 
 export const CoinTitle = styled.h1`

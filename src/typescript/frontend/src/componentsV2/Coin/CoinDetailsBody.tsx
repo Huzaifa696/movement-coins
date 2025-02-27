@@ -12,7 +12,7 @@ const ContentWrapper = styled.div`
   flex-wrap: wrap;
   margin-top: 4rem;
   position: relative;
-  z-index: 10;
+  z-index: 9999;
 `;
 
 const SideImageContainer = styled.div`
@@ -42,7 +42,7 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
   const [showInfo, setShowInfo] = useState(false);
   return (
     <div className="container px-4">
-      <ContentWrapper>
+      <ContentWrapper >
         <SideImageContainer>
           <StyledImage
             src={props.coinImage ?? "/images/coin/match1.png"}
@@ -68,7 +68,7 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
           <StyledImage src="/images/coin/match2.png" />
         </div>
         <div className="flex negative-margin justify-end mb-5 px-2 md:px-0 w-full z-1">
-          <span  onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
+          <span onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
             <StyledImage src="/images/coin/info.png" />
           </span>
         </div>
@@ -87,10 +87,10 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
         )}
 
         <MarketCard />
-        <ProgressBar title="CORAL REEFS SAVED" progress={183} />
+        <ProgressBar title="CORAL REEFS SAVED" progress={66} />
         <ProgressBar title="EDUCATORS TRAINED" progress={31} variant="pink" />
       </ContentWrapper>
-      <StyledImage className="w-full absolute bottom-match" src="/images/home/match.png" />
+      <StyledImage className="w-full absolute bottom-match z-1" src="/images/home/match.png" />
     </div>
   );
 };

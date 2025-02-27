@@ -155,3 +155,7 @@
     justify-content: center;
   }
 }
+
+#tv-attr-logo {
+  display: none !important;
+}

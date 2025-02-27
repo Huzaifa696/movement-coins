@@ -65,7 +65,9 @@
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "use-scramble": "^2.2.15",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "lightweight-charts": "^4.1.1",
+    "date-fns": "^2.30.0"
   },
   "devDependencies": {
     "prisma": "^6.4.1",
