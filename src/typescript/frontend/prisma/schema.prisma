@@ -18,7 +18,11 @@ model CoinsList {
 }
 
 type Meta {
-  title       String
-  description String
-  imageURL    String
+  title                String
+  description          String
+  imageURL             String
+  nonProfitName        String?
+  nonProfitDescription String?
+  nonProfitImageURL    String?
+  nonProfitLink        String?
 }

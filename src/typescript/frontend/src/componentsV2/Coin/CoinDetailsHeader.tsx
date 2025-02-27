@@ -2,14 +2,19 @@
 import React, { useMemo } from "react";
 import { HeaderContainer, CoinTitle, CoinDescription, CoinDescriptionSpan } from "./styled";
 import { useParams } from "next/navigation";
+import { type CoinsList } from "@prisma/client";
 
-const CoinDetailsHeader = (): JSX.Element => {
+const CoinDetailsHeader = ({ coinDetails }: { coinDetails: CoinsList | null }): JSX.Element => {
   const params = useParams();
   const name = (params?.market as string) ?? "BLACK_HEART";
 
   const formattedName = useMemo(() => {
     return name.replace(/[_-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
   }, [name]);
+
+  const nonProfitLink = coinDetails?.meta?.nonProfitLink ?? null;
+  const nonProfitName = coinDetails?.meta?.nonProfitName ?? "";
+  const nonProfitDescription = coinDetails?.meta?.nonProfitDescription ?? "";
 
   return (
     <HeaderContainer>
@@ -21,17 +26,11 @@ const CoinDetailsHeader = (): JSX.Element => {
               1% of every trade goes to{" "}
               <CoinDescriptionSpan
                 className="text-third underline cursor-pointer z-9999"
-                onClick={() =>
-                  window.open(
-                    "https://www.forcoral.org/",
-                    "_blank"
-                  )
-                }
+                onClick={() => nonProfitLink && window.open(nonProfitLink, "_blank")}
               >
-                Project Zero’s Coral Collective,
+                {nonProfitName},
               </CoinDescriptionSpan>{" "}
-              a multiyear global initiative
-              <br /> and the largest global conservation effort to save coral reefs from extinction.
+              {nonProfitDescription}
             </CoinDescription>
           </div>
         </div>

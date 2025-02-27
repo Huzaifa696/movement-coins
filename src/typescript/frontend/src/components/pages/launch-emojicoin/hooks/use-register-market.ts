@@ -95,6 +95,10 @@ export const useRegisterMarket = () => {
     title: string;
     description: string;
     image: string;
+    nonProfitName: string;
+    nonProfitDescription: string;
+    nonProfitImage: string;
+    nonProfitLink: string;
   }) => {
     if (!account) {
       return;
@@ -134,6 +138,10 @@ export const useRegisterMarket = () => {
           title: launchCoinData.title,
           description: launchCoinData.description,
           imageURL: launchCoinData.image,
+          nonProfitName: launchCoinData.nonProfitName,
+          nonProfitDescription: launchCoinData.nonProfitDescription,
+          nonProfitImageURL: launchCoinData.nonProfitImage,
+          nonProfitLink: launchCoinData.nonProfitLink,
         },
       });
 

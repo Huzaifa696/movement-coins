@@ -11,6 +11,7 @@ import CoinDetailsBody from "componentsV2/Coin/CoinDetailsBody";
 import Chart from "components/Chart/Chart";
 import { useParams } from "next/navigation";
 import { formatEmojiNameThroughSlug } from "components/pages/home/components/emoji-table/utils";
+import { type CoinsList } from "@prisma/client";
 // import Chart from "@/components/Chart/Chart";
 
 const EVENT_TYPES: BrokerEvent[] = ["Chat", "PeriodicState", "Swap"];
@@ -126,9 +127,7 @@ interface PriceHistoryItem {
 type EmojicoinProps2 = EmojicoinProps & {
   data: {
     priceHistory?: PriceHistoryItem[];
-    // ... other existing props
   };
-  // ... other existing props
 };
 
 const ClientEmojicoinPageV2 = (props: EmojicoinProps2) => {
@@ -155,8 +154,8 @@ const ClientEmojicoinPageV2 = (props: EmojicoinProps2) => {
   return (
     <>
       <div className="relative overflow-hidden pt-[120px] md:pt-[130px] lg:pt-[130px]">
-        <CoinDetailsHeader />
-        <CoinDetailsBody data={props.data} coinImage={props?.data?.coinImage} />
+        <CoinDetailsHeader coinDetails={props.data?.coinDetails ?? null} />
+        <CoinDetailsBody data={props.data} coinDetails={props.data?.coinDetails ?? null} />
       </div>
       {/* <div className="container mx-auto px-4 mt-16">
         <Chart

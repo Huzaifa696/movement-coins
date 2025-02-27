@@ -71,7 +71,7 @@ const HeroSection: React.FC<MainCardPropsV2> = (props): JSX.Element => {
               +30.65%
             </div>
             <div className="pl-4 py-2 pr-1 font-medium text-lg border-white text-white rounded-full uppercase flex-box">
-              <span>save coral reefs</span>
+              <span>{featured?.coinMeta?.description}</span>
               <span className="ml-2">
                 <StyledImage src="/images/coin/info.png" width={26} height={26} />
               </span>
