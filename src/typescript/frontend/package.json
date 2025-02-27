@@ -65,7 +65,9 @@
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "use-scramble": "^2.2.15",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "lightweight-charts": "^4.1.1",
+    "date-fns": "^2.30.0"
   },
   "devDependencies": {
     "prisma": "^6.4.1",
@@ -107,7 +109,7 @@
     "build:no-checks": "IGNORE_BUILD_ERRORS=true next build --no-lint",
     "check": "next build --experimental-build-mode compile",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf .next",
-    "dev": "NODE_OPTIONS='--inspect' next dev --turbo --port 3001",
+    "dev": "next dev --turbo --port 3001",
     "format": "pnpm _format --list-different --write",
     "format:check": "pnpm _format --check",
     "lint": "eslint --max-warnings=0 -c .eslintrc.js --ext .js,.jsx,.ts,.tsx .",

@@ -19,9 +19,17 @@ const CoinDetailsHeader = (): JSX.Element => {
             <CoinTitle>{formattedName}</CoinTitle>
             <CoinDescription>
               1% of every trade goes to{" "}
-              <CoinDescriptionSpan className="text-third underline">
+              <CoinDescriptionSpan
+                className="text-third underline cursor-pointer z-9999"
+                onClick={() =>
+                  window.open(
+                    "https://www.forcoral.org/",
+                    "_blank"
+                  )
+                }
+              >
                 Project Zero’s Coral Collective,
-              </CoinDescriptionSpan>
+              </CoinDescriptionSpan>{" "}
               a multiyear global initiative
               <br /> and the largest global conservation effort to save coral reefs from extinction.
             </CoinDescription>
