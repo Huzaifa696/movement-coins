@@ -36,7 +36,7 @@ const EVENTS_ON_PAGE_LOAD = 25;
 export async function generateMetadata({ params }: EmojicoinPageProps): Promise<Metadata> {
   const { market: coinSlug } = params;
   const title = `${coinSlug}`;
-  const description = `Trade ${coinSlug} on emojicoin.fun !`;
+  const description = `Trade ${coinSlug} on movement coin !`;
 
   return {
     title,

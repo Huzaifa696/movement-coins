@@ -68,14 +68,14 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
           <StyledImage src="/images/coin/match2.png" />
         </div>
         <div className="flex negative-margin justify-end mb-5 px-2 md:px-0 w-full z-1">
-          <a href="#" onClick={() => setShowInfo(!showInfo)}>
+          <span  onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
             <StyledImage src="/images/coin/info.png" />
-          </a>
+          </span>
         </div>
         {showInfo ? (
           <div className="flex w-full flex-wrap px-2 md:px-0 items-center justify-end">
             <div className="box-show px-5 py-3 rounded-full max-content text-white">
-              1% of every trade goes to Greenpeace
+              1% of every trade goes to Project Zero’s
             </div>
 
             <a href="#" onClick={() => setShowInfo(false)}>
@@ -87,7 +87,8 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
         )}
 
         <MarketCard />
-        <ProgressBar />
+        <ProgressBar title="CORAL REEFS SAVED" progress={183} />
+        <ProgressBar title="EDUCATORS TRAINED" progress={31} variant="pink" />
       </ContentWrapper>
       <StyledImage className="w-full absolute bottom-match" src="/images/home/match.png" />
     </div>
