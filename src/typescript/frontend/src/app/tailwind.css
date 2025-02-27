@@ -3182,10 +3182,18 @@ video {
   right: -7% !important;
 }
 
+@media screen and (max-width: 1776px) {
+  .bottom-match {
+    bottom: -18% !important;
+    right: -5% !important;
+  }
+
+}
+
 @media (max-width: 1440px) {
   .bottom-match {
     bottom: -0% !important;
-    right: 2% !important;
+    right: 0% !important;
   }
 }
 

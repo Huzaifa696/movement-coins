@@ -68,9 +68,9 @@ const CoinDetailsBody = (props: GridProps & { coinImage?: string }): JSX.Element
           <StyledImage src="/images/coin/match2.png" />
         </div>
         <div className="flex negative-margin justify-end mb-5 px-2 md:px-0 w-full z-1">
-          <a href="#" onClick={() => setShowInfo(!showInfo)}>
+          <span  onClick={() => setShowInfo(!showInfo)}>
             <StyledImage src="/images/coin/info.png" />
-          </a>
+          </span>
         </div>
         {showInfo ? (
           <div className="flex w-full flex-wrap px-2 md:px-0 items-center justify-end">
