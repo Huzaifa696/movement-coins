@@ -1,4 +1,5 @@
 import { type SymbolString } from "@/store/event/types";
+import { type CoinsList } from "@prisma/client";
 import { type SymbolEmoji } from "@sdk/emoji_data/types";
 import { type AccountAddressString } from "@sdk/emojicoin_dot_fun";
 import { type MarketMetadataModel, type DatabaseModels } from "@sdk/indexer-v2/types";
@@ -14,6 +15,7 @@ type DataProps = MarketMetadataModel & {
   state: DatabaseModels["market_state"];
   marketView: Types["MarketView"];
   coinImage?: string;
+  coinDetails?: CoinsList | null;
 };
 
 export interface EmojicoinProps {

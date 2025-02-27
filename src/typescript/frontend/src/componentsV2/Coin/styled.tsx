@@ -5,6 +5,8 @@ export const HeaderContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 9999;
 `;
 
 export const CoinTitle = styled.h1`
@@ -24,6 +26,8 @@ export const CoinDescription = styled.p`
   line-height: 35px !important;
   letter-spacing: 0% !important;
   text-align: center !important;
+  max-width: 900px;
+  overflow-wrap: break-word;
 `;
 
 export const CoinDescriptionSpan = styled.span`

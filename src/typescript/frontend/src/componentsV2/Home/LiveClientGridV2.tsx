@@ -78,6 +78,8 @@ export const LiveClientGridV2 = ({
       title: marketData?.coinMeta?.title || null,
       description: marketData?.coinMeta?.description || null,
       imageURL: marketData?.coinMeta?.imageURL || null,
+      nonProfitImage: marketData?.coinMeta?.nonProfitImageURL || null
+      
     };
   });
 
@@ -173,7 +175,7 @@ export const LiveClientGridV2 = ({
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col gap-[30px] mt-[42px]">
       {orderedWithCoinMeta?.map((v) => {
         return (
           <CoinCard
@@ -187,6 +189,7 @@ export const LiveClientGridV2 = ({
             emojis={v.emojis}
             imageURL={v.imageURL}
             titleSlug={v.titleSlug ?? emojiNamesToPath(v.emojis.map((x) => x.name))}
+            nonProfit={v.nonProfitImage}
           />
           // <TableCard
           //   key={`live-${v.marketID}-${v.searchEmojisKey}`}

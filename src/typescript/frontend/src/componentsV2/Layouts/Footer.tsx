@@ -8,7 +8,15 @@ const FooterComponent = (): JSX.Element => {
         <Container>
           <TextWrapper>
             <FooterText>
-              V.M.C is a product of <a href="https://www.values.network">Values Network.</a>
+              V.M.C is a product of{" "}
+              <a
+                href="https://www.values.network"
+                style={{
+                  textDecorationLine: "underline",
+                }}
+              >
+                Values Network.
+              </a>
             </FooterText>
           </TextWrapper>
         </Container>

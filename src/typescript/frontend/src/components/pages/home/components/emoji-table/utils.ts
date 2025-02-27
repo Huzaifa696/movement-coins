@@ -112,3 +112,12 @@ export const constructOrdered = ({
 
 export const toSerializedGridOrder = <T extends { marketID: number }>(data: T[]) =>
   data.map((v) => v.marketID).join(",");
+
+export const formatEmojiNameThroughSlug = (slug: string) => {
+  try {
+    return slug.replace(/[_-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  } catch (error) {
+    console.error("Error formatting emoji name through slug:", error);
+    return slug;
+  }
+};

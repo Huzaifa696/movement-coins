@@ -100,7 +100,7 @@ export const ButtonWithConnectWalletFallback = ({
             /> */}
             <div className={!mobile ? "" : "text-[#C95A48] text-[32px] leading-[40px]"}>
               <div
-                className="whitespace-nowrap text-overflow-ellipsis overflow-hidden"
+                className="whitespace-nowrap text-overflow-ellipsis overflow-hidden font-sifonn"
                 style={{ minWidth: width, color: "#C95A48" }}
                 ref={ref}
               />

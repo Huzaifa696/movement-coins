@@ -10,6 +10,7 @@ import { getAptPrice } from "lib/queries/get-apt-price";
 import dynamic from "next/dynamic";
 import ClientEmojicoinPageV2 from "./ClientEmojicoinPageV2";
 import { prisma } from "lib/prisma";
+import { getCoin } from "app/actions/createCoin";
 
 const AptPriceContextProvider = dynamic(() => import("context/AptPrice").then((mod) => mod.AptPriceContextProvider), {
   ssr: false,
@@ -92,7 +93,7 @@ const EmojicoinPage = async (params: EmojicoinPageProps) => {
       wrappedCachedContractMarketView(marketAddress.toString()),
       getAptPrice(),
     ]);
-
+    const coin = await getCoin(marketSlug);
     return (
       <AptPriceContextProvider aptPrice={aptPrice}>
         <ClientEmojicoinPageV2
@@ -102,7 +103,8 @@ const EmojicoinPage = async (params: EmojicoinPageProps) => {
             chats,
             state,
             marketView,
-            coinImage: coin?.meta.imageURL,
+            coinImage: coin?.data?.meta.imageURL,
+            coinDetails: coin?.data ?? null,
             ...state.market,
           }}
         />

@@ -34,7 +34,7 @@ const HomePageComponentV2: React.FC<HomePageProps> = async ({
         </div>
       </div>
       <StyledImage
-        style={{ height: "60%", marginBottom: "-40px", zIndex: -1 }}
+        style={{ height: "60%", marginBottom: "-40px", zIndex: -1, left: "50%" }}
         className="w-full absolute bottom z-40"
         src="/images/home/coin-list-gradient.png"
       />
