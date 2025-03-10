@@ -1,0 +1,10 @@
+
+# initialize CLI config for localnet
+aptos init --assume-yes --encoding hex  --profile non_profit --private-key 0x4e9e6bb65e92b65ae2f6a9649d5f83652d1df7c83c02c1e490ba47e02e678f50 --network custom --rest-url http://127.0.0.1:8080 --faucet-url http://127.0.0.1:8081
+
+aptos account balance --profile non_profit --account 0xf7a6038b50b9d07337b036d0b8d2d8f9217bf8c02c2df8a91f7a5b6f9c61afa4
+
+aptos account create --profile non_profit --account abc --assume-yes
+
+aptos account list --profile non_profit --account 0xabc
+
