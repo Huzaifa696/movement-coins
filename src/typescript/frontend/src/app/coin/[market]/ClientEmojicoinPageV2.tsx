@@ -11,14 +11,13 @@ import CoinDetailsBody from "componentsV2/Coin/CoinDetailsBody";
 import Chart from "components/Chart/Chart";
 import { useParams } from "next/navigation";
 import { formatEmojiNameThroughSlug } from "components/pages/home/components/emoji-table/utils";
-import { type CoinsList } from "@prisma/client";
 // import Chart from "@/components/Chart/Chart";
 
 const EVENT_TYPES: BrokerEvent[] = ["Chat", "PeriodicState", "Swap"];
 
 const DUMMY_PRICE_HISTORY = [
   {
-    timestamp: "2024-01-15 09:00",
+    timestamp: "2025-01-15 09:00",
     open: 0.000008,
     high: 0.000009,
     low: 0.000007,
@@ -26,7 +25,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 5000,
   },
   {
-    timestamp: "2024-01-30 14:30",
+    timestamp: "2025-01-30 14:30",
     open: 0.000012,
     high: 0.000015,
     low: 0.000011,
@@ -34,7 +33,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 8500,
   },
   {
-    timestamp: "2024-02-14 11:15",
+    timestamp: "2025-02-14 11:15",
     open: 0.000018,
     high: 0.000022,
     low: 0.000017,
@@ -42,7 +41,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 12000,
   },
   {
-    timestamp: "2024-02-28 16:45",
+    timestamp: "2025-02-28 16:45",
     open: 0.000025,
     high: 0.000028,
     low: 0.000023,
@@ -50,7 +49,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 15500,
   },
   {
-    timestamp: "2024-03-05 10:30",
+    timestamp: "2025-03-05 10:30",
     open: 0.000030,
     high: 0.000035,
     low: 0.000029,
@@ -58,15 +57,15 @@ const DUMMY_PRICE_HISTORY = [
     volume: 18000,
   },
   {
-    timestamp: "2024-03-12 13:20",
+    timestamp: "2025-03-12 13:20",
     open: 0.000028,
     high: 0.000030,
     low: 0.000025,
-    close: 0.000027,
+    close: 0.000007,
     volume: 13500,
   },
   {
-    timestamp: "2024-03-15 15:45",
+    timestamp: "2025-03-15 15:45",
     open: 0.000035,
     high: 0.000040,
     low: 0.000034,
@@ -74,7 +73,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 22000,
   },
   {
-    timestamp: "2024-03-18 09:15",
+    timestamp: "2025-03-18 09:15",
     open: 0.000042,
     high: 0.000045,
     low: 0.000040,
@@ -82,7 +81,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 25000,
   },
   {
-    timestamp: "2024-03-19 11:30",
+    timestamp: "2025-03-19 11:30",
     open: 0.000038,
     high: 0.000041,
     low: 0.000036,
@@ -90,7 +89,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 19500,
   },
   {
-    timestamp: "2024-03-20 14:00",
+    timestamp: "2025-03-20 14:00",
     open: 0.000045,
     high: 0.000048,
     low: 0.000043,
@@ -98,7 +97,7 @@ const DUMMY_PRICE_HISTORY = [
     volume: 28000,
   },
   {
-    timestamp: "2024-03-21 10:45",
+    timestamp: "2025-03-21 10:45",
     open: 0.000050,
     high: 0.000055,
     low: 0.000048,
@@ -106,12 +105,28 @@ const DUMMY_PRICE_HISTORY = [
     volume: 32000,
   },
   {
-    timestamp: "2024-03-22 16:00",
-    open: 0.000056,
+    timestamp: "2025-03-22 16:00",
+    open: 0.000052,
     high: 0.000060,
     low: 0.000054,
-    close: 0.000058,
+    close: 0.00058,
     volume: 35000,
+  },
+  {
+    timestamp: "2025-03-23 13:15",
+    open: 0.00058,
+    high: 0.000065,
+    low: 0.000059,
+    close: 0.000063,
+    volume: 38000,
+  },
+  {
+    timestamp: "2025-03-24 10:30",
+    open: 0.000063,
+    high: 0.000072,
+    low: 0.000066,
+    close: 0.000070,
+    volume: 41000,
   }
 ];
 
