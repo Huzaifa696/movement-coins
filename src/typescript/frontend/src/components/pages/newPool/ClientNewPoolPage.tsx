@@ -2,158 +2,107 @@
 
 import { FlexGap } from "@containers";
 import { ErrorBoundary, ErrorBoundaryFallback, Heading, Text } from "components";
-import { useEmojiPicker } from "context/emoji-picker-context";
-import { useAptos } from "context/wallet-context/AptosContextProvider";
-import { useMatchBreakpoints } from "hooks";
 import { useEffect, useState } from "react";
 import {
-  StyledAddLiquidityButton,
   StyledAddLiquidityCard,
   StyledAddLiquidityTitle,
   StyledContentWrapper,
-  StyledFilterRow,
   StyledForm,
   StyledHeader,
-  StyledPoolItem,
-  StyledPoolMainContent,
-  StyledPoolRow,
-  StyledPoolSubtext,
   StyledPoolTab,
   StyledPoolsContainer,
-  StyledPoolsGrid,
   StyledPoolsListCard,
   StyledReservesCard,
   StyledTabsContainer,
-  StyledWrapper
+  StyledWrapper,
 } from "./styled";
+import { type PoolsData } from "../pools/ClientPoolsPage";
+import { useMatchBreakpoints } from "hooks";
+import { parseJSON } from "utils";
+import type { SortByPageQueryParams } from "lib/queries/sorting/types";
+import { MARKETS_PER_PAGE } from "lib/queries/sorting/const";
+import { useAptos } from "context/wallet-context/AptosContextProvider";
+import { useEmojiPicker } from "context/emoji-picker-context";
+import { useSearchParams } from "next/navigation";
+import { encodeEmojis, getEmojisInString, type SymbolEmoji } from "@sdk/emoji_data";
+import { DEFAULT_POOLS_SORT_BY } from "@sdk/indexer-v2/queries/query-params";
+import PoolsTableNew from "../pools/components/pools-table/PoolsTableNew";
+import { getCoin } from "app/actions/createCoin";
 
-// Define the data type that will be passed from the server component
-export type NewPoolData = {
-  // Add necessary properties here
-};
-
-// Update the mock data to match the image exactly
-const EXACT_MOCK_POOLS = [
-  {
-    id: 1,
-    name: "COIN TITLE",
-    mktCap: "$675,4534.99",
-    vol24h: "$675,4534.99",
-    allTime: "$1,000,000",
-    tvl: "$1,000,000",
-    dpr: "$1,000,000",
-  },
-  {
-    id: 2,
-    name: "COIN TITLE",
-    mktCap: "$675,4534.99",
-    vol24h: "$675,4534.99", 
-    allTime: "$1,000,000",
-    tvl: "$1,000,000",
-    dpr: "$1,000,000",
-  },
-  {
-    id: 3,
-    name: "COIN TITLE",
-    mktCap: "$675,4534.99",
-    vol24h: "$675,4534.99",
-    allTime: "$1,000,000",
-    tvl: "$1,000,000",
-    dpr: "$1,000,000",
-  },
-  {
-    id: 4,
-    name: "COIN TITLE",
-    mktCap: "$675,4534.99",
-    vol24h: "$675,4534.99",
-    allTime: "$1,000,000",
-    tvl: "$1,000,000",
-    dpr: "$1,000,000",
-  },
-  {
-    id: 5,
-    name: "COIN TITLE",
-    mktCap: "$675,4534.99",
-    vol24h: "$675,4534.99",
-    allTime: "$1,000,000",
-    tvl: "$1,000,000",
-    dpr: "$1,000,000",
-  },
-];
-
-const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => {
-  const { isMobile, isTablet, isDesktop } = useMatchBreakpoints();
-  const { account } = useAptos();
+const NewPoolContent = ({ initialData = [] }: { initialData?: PoolsData[] }) => {
+  const mobileMenuOpen = false;
+  const searchParams = useSearchParams();
+  const poolParam = searchParams.get("pool");
+  const [sortBy, setSortBy] = useState<SortByPageQueryParams>(DEFAULT_POOLS_SORT_BY);
+  const [orderBy, setOrderBy] = useState<"desc" | "asc">("desc");
+  const [selectedIndex, setSelectedIndex] = useState<number | undefined>(poolParam ? 0 : undefined);
+  const [page, setPage] = useState<number>(1);
+  const [markets, setMarkets] = useState<any[]>(initialData);
+  const [allDataIsLoaded, setAllDataIsLoaded] = useState<boolean>(false);
+  const [pools, setPools] = useState<"all" | "mypools">("all");
+  const [realEmojis, setRealEmojis] = useState(getEmojisInString(poolParam ?? ""));
   const { emojis, setEmojis } = useEmojiPicker((state) => ({
     emojis: state.emojis,
     setEmojis: state.setEmojis,
   }));
-
-  // State management for the pools page
-  const [isCreating, setIsCreating] = useState(false);
-  const [activeTab, setActiveTab] = useState<"all" | "my">("all");
-  const [assetAmount, setAssetAmount] = useState<string>("");
-  const [reserveAmount, setReserveAmount] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Use connected state based on account existence
-  const connected = !!account;
-
-  // Use the exact mock data to match the image
-  const [filteredPools, setFilteredPools] = useState(EXACT_MOCK_POOLS);
-
-  // Filter pools based on active tab
   useEffect(() => {
-    if (activeTab === "all") {
-      setFilteredPools(EXACT_MOCK_POOLS);
-    } else {
-      // In a real app, this would filter based on user's connected wallet
-      setFilteredPools(connected ? EXACT_MOCK_POOLS.filter((pool, index) => index < 3) : []);
+    setEmojis(realEmojis);
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, []);
+
+  const { account } = useAptos();
+
+  useEffect(() => {
+    setRealEmojis(emojis as SymbolEmoji[]);
+  }, [emojis]);
+
+  useEffect(() => {
+    const poolsAPI = "/pools/api";
+    const params = new URLSearchParams({
+      sortby: sortBy,
+      orderby: orderBy,
+      page: page.toString(),
+    });
+    if (pools === "mypools" && account?.address) {
+      params.set("account", account.address);
     }
-  }, [activeTab, connected]);
-
-  const handleCreatePool = async () => {
-    if (!connected) {
-      setErrorMessage("Please connect your wallet to add liquidity.");
-      setTimeout(() => setErrorMessage(null), 5000);
-      return;
+    if (realEmojis.length) {
+      params.set("searchBytes", encodeEmojis(realEmojis));
     }
+    const url = `${poolsAPI}?${params.toString()}`;
+    fetch(url)
+      .then((res) => res.text())
+      .then((txt) => parseJSON(txt) as PoolsData[])
+      .then(async (data) => {
+        // Fetch coin data for each pool
+        const dataWithCoinInfo = await Promise.all(
+          data.map(async (pool) => {
+            const coin = await getCoin(pool?.market?.symbolData?.name);
+            return {
+              ...pool,
+              coinMeta: coin?.data
+                ? {
+                    ...coin.data.meta,
+                    titleSlug: coin.data.titleSlug,
+                  }
+                : null,
+            };
+          })
+        );
 
-    if (!assetAmount || !reserveAmount) {
-      setErrorMessage("Please enter both asset and reserve amounts.");
-      setTimeout(() => setErrorMessage(null), 5000);
-      return;
-    }
+        if (dataWithCoinInfo.length < MARKETS_PER_PAGE) {
+          setAllDataIsLoaded(true);
+        }
+        setMarkets((markets) =>
+          page === 1 ? [...dataWithCoinInfo] : [...markets, ...dataWithCoinInfo]
+        );
+      });
+  }, [page, orderBy, sortBy, account, pools, realEmojis]);
 
-    setErrorMessage(null);
-    setIsCreating(true);
-
-    try {
-      // Simulate API call with a timeout
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      setSuccessMessage(`Successfully added ${assetAmount} to the pool!`);
-      setTimeout(() => setSuccessMessage(null), 5000);
-
-      // Reset form
-      setAssetAmount("");
-      setReserveAmount("");
-    } catch (error) {
-      console.error("Error creating pool:", error);
-      setErrorMessage("Failed to add liquidity. Please try again.");
-      setTimeout(() => setErrorMessage(null), 5000);
-    } finally {
-      setIsCreating(false);
-    }
-  };
+  const { isMobile } = useMatchBreakpoints();
 
   return (
     <StyledWrapper>
-      {/* Top Navigation */}
-      
-
       <StyledContentWrapper>
         {/* Page Header */}
         <StyledHeader>
@@ -165,11 +114,14 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
         <FlexGap flexDirection="column" width="100%">
           <StyledPoolsContainer>
             {/* Left side - Add Liquidity */}
-            <div style={{ 
-              display: "flex", 
-              flexDirection: "column",
-              width: isMobile ? "100%" : "auto"
-            }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                width: isMobile ? "100%" : "auto",
+                marginTop: "20px",
+              }}
+            >
               <StyledAddLiquidityTitle>
                 <Heading fontSize={isMobile ? "20px" : "25px"} fontWeight="700" fontFamily="Sifonn">
                   ADD LIQUIDITY
@@ -199,9 +151,11 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                 </Text>
               </StyledAddLiquidityTitle>
 
-              <StyledAddLiquidityCard style={{
-                maxWidth: isMobile ? "100%" : "320px"
-              }}>
+              <StyledAddLiquidityCard
+                style={{
+                  maxWidth: isMobile ? "100%" : "320px",
+                }}
+              >
                 <StyledForm>
                   <FlexGap alignItems="center" gap="15px">
                     <div className="token-icon">
@@ -238,7 +192,7 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     <div className="horizontal-line"></div>
                   </div>
 
-                  {successMessage && (
+                  {/* {successMessage && (
                     <Text
                       color="lightGray"
                       mt="10px"
@@ -248,9 +202,9 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     >
                       {successMessage}
                     </Text>
-                  )}
+                  )} */}
 
-                  {errorMessage && (
+                  {/* {errorMessage && (
                     <Text
                       color="lightGray"
                       mt="10px"
@@ -260,11 +214,11 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     >
                       {errorMessage}
                     </Text>
-                  )}
+                  )} */}
 
-                  <StyledAddLiquidityButton onClick={handleCreatePool} disabled={isCreating}>
+                  {/* <StyledAddLiquidityButton onClick={handleCreatePool} disabled={isCreating}>
                     {isCreating ? "Processing..." : "ADD LIQUIDITY"}
-                  </StyledAddLiquidityButton>
+                  </StyledAddLiquidityButton> */}
                 </StyledForm>
               </StyledAddLiquidityCard>
 
@@ -284,47 +238,53 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                 RESERVES
               </Heading>
 
-              <StyledReservesCard style={{
-                maxWidth: isMobile ? "100%" : "320px"
-              }}>
+              <StyledReservesCard
+                style={{
+                  maxWidth: isMobile ? "100%" : "320px",
+                }}
+              >
                 {/* The horizontal line is now built into the card styling */}
               </StyledReservesCard>
             </div>
 
             {/* Right side - Pools List */}
             {(!isMobile || (isMobile && !mobileMenuOpen)) && (
-              <StyledPoolsListCard style={{
-                marginLeft: isMobile ? "0" : "15px",
-                marginTop: isMobile ? "2rem" : "0",
-                width: isMobile ? "100%" : "auto"
-              }}>
+              <StyledPoolsListCard
+                style={{
+                  marginLeft: isMobile ? "0" : "15px",
+                  marginTop: isMobile ? "2rem" : "0",
+                  width: isMobile ? "100%" : "auto",
+                }}
+              >
                 {/* Tabs at the top */}
-                <div style={{ 
-                  display: "flex", 
-                  flexDirection: "column", 
-                  paddingLeft: isMobile ? "10px" : "20px",
-                  width: "100%"
-                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    paddingLeft: isMobile ? "10px" : "20px",
+                    width: "100%",
+                  }}
+                >
                   <StyledTabsContainer>
                     <StyledPoolTab
-                      active={activeTab === "all"}
-                      onClick={() => setActiveTab("all")}
-                      style={{ 
-                        fontSize: isMobile ? "20px" : "25px", 
-                        fontFamily: "Sifonn", 
-                        fontWeight: 700
+                      active={pools === "all"}
+                      onClick={() => setPools("all")}
+                      style={{
+                        fontSize: isMobile ? "20px" : "25px",
+                        fontFamily: "Sifonn",
+                        fontWeight: 700,
                       }}
                     >
                       ALL POOLS
                     </StyledPoolTab>
                     <StyledPoolTab
-                      active={activeTab === "my"}
-                      onClick={() => setActiveTab("my")}
+                      active={pools === "mypools"}
+                      onClick={() => setPools("mypools")}
                       style={{
                         fontSize: isMobile ? "20px" : "25px",
                         fontFamily: "Sifonn",
                         fontWeight: 700,
-                        color: activeTab === "my" ? "white" : "rgba(255, 255, 255, 0.5)",
+                        color: pools === "mypools" ? "white" : "rgba(255, 255, 255, 0.5)",
                       }}
                     >
                       MY POOLS
@@ -332,20 +292,19 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                   </StyledTabsContainer>
 
                   <Text
+                    fontFamily="Lora"
                     style={{
-                      fontFamily: "Lora",
                       fontSize: isMobile ? "13px" : "15px",
                       lineHeight: "100%",
                       fontWeight: 400,
                       color: "#FEF8ED",
-                      marginTop: "10px",
-                      marginBottom: "15px",
+                      marginTop: "20px",
+                      marginBottom: "25px",
                     }}
                   >
                     Trending pools today:
                     <span
                       style={{
-                        fontFamily: "Lora",
                         fontWeight: 400,
                         textDecoration: "underline",
                         textDecorationStyle: "solid",
@@ -356,7 +315,6 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     </span>
                     <span
                       style={{
-                        fontFamily: "Lora",
                         fontWeight: 700,
                         textDecoration: "underline",
                         textDecorationStyle: "solid",
@@ -367,7 +325,6 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     </span>
                     <span
                       style={{
-                        fontFamily: "Lora",
                         fontWeight: 700,
                         verticalAlign: "middle",
                       }}
@@ -376,7 +333,6 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     </span>
                     <span
                       style={{
-                        fontFamily: "Lora",
                         fontWeight: 700,
                         textDecoration: "underline",
                         textDecorationStyle: "solid",
@@ -387,7 +343,6 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     </span>
                     <span
                       style={{
-                        fontFamily: "Lora",
                         fontWeight: 700,
                         verticalAlign: "middle",
                       }}
@@ -396,7 +351,6 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     </span>
                     <span
                       style={{
-                        fontFamily: "Lora",
                         fontWeight: 700,
                         textDecoration: "underline",
                         textDecorationStyle: "solid",
@@ -407,7 +361,6 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                     </span>
                     <span
                       style={{
-                        fontFamily: "Lora",
                         fontWeight: 700,
                         verticalAlign: "middle",
                       }}
@@ -417,229 +370,29 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
                   </Text>
                 </div>
 
-                <StyledFilterRow>
-                  <StyledPoolItem>
-                    <Text
-                      color="white"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                      fontSize={isMobile ? "9px" : "11px"}
-                      style={{ fontFamily: "Lora", letterSpacing: "1px" }}
-                    >
-                      NAME{" "}
-                      <span style={{ fontSize: "8px", marginLeft: "4px", verticalAlign: "middle" }}>
-                        ▼
-                      </span>
-                    </Text>
-                  </StyledPoolItem>
-                  <StyledPoolItem>
-                    <Text
-                      color="white"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                      fontSize={isMobile ? "9px" : "11px"}
-                      style={{ fontFamily: "Lora", letterSpacing: "1px" }}
-                    >
-                      MKT CAP{" "}
-                      <span style={{ fontSize: "8px", marginLeft: "4px", verticalAlign: "middle" }}>
-                        ▼
-                      </span>
-                    </Text>
-                  </StyledPoolItem>
-                  <StyledPoolItem>
-                    <Text
-                      color="white"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                      fontSize={isMobile ? "9px" : "11px"}
-                      style={{ fontFamily: "Lora", letterSpacing: "1px" }}
-                    >
-                      24 VOL{" "}
-                      <span style={{ fontSize: "8px", marginLeft: "4px", verticalAlign: "middle" }}>
-                        ▼
-                      </span>
-                    </Text>
-                  </StyledPoolItem>
-                  {!isMobile && (
-                    <>
-                      <StyledPoolItem>
-                        <Text
-                          color="white"
-                          fontWeight="700"
-                          textTransform="uppercase"
-                          fontSize="11px"
-                          style={{ fontFamily: "Lora", letterSpacing: "1px" }}
-                        >
-                          ALL TIME{" "}
-                          <span style={{ fontSize: "8px", marginLeft: "4px", verticalAlign: "middle" }}>
-                            ▼
-                          </span>
-                        </Text>
-                      </StyledPoolItem>
-                      <StyledPoolItem>
-                        <Text
-                          color="white"
-                          fontWeight="700"
-                          textTransform="uppercase"
-                          fontSize="11px"
-                          style={{ fontFamily: "Lora", letterSpacing: "1px" }}
-                        >
-                          TVL{" "}
-                          <span style={{ fontSize: "8px", marginLeft: "4px", verticalAlign: "middle" }}>
-                            ▼
-                          </span>
-                        </Text>
-                      </StyledPoolItem>
-                      <StyledPoolItem>
-                        <Text
-                          color="white"
-                          fontWeight="700"
-                          textTransform="uppercase"
-                          fontSize="11px"
-                          style={{ fontFamily: "Lora", letterSpacing: "1px" }}
-                        >
-                          DPR{" "}
-                          <span style={{ fontSize: "8px", marginLeft: "4px", verticalAlign: "middle" }}>
-                            ▼
-                          </span>
-                        </Text>
-                      </StyledPoolItem>
-                    </>
-                  )}
-                </StyledFilterRow>
-
-                <StyledPoolsGrid>
-                  {filteredPools.length > 0 ? (
-                    filteredPools.slice(0, isMobile ? 3 : filteredPools.length).map((pool, index) => (
-                      <StyledPoolRow key={pool.id}>
-                        <StyledPoolMainContent>
-                          <div className="pool-icon">
-                            <img src="/images/pool/Aptos_White.png" alt="Coin"/>
-                            {index === 0 && <div className="star-indicator"></div>}
-                          </div>
-                          <div style={{ 
-                            display: "flex", 
-                            flexDirection: "column", 
-                            gap: "10px", 
-                            width: "100%",
-                            overflow: "hidden"
-                          }}>
-                            <div>
-                              <div className="pool-details" style={{
-                                gridTemplateColumns: isMobile 
-                                  ? "2fr 1.5fr 1.5fr" 
-                                  : "2fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr"
-                              }}>
-                                <div className="detail-item">
-                                  <Text
-                                    fontSize={isMobile ? "13px" : "15px"}
-                                    fontWeight="700"
-                                    letterSpacing={"0.5px"}
-                                    lineHeight={"20px"}
-                                    color={"white"}
-                                    style={{ fontFamily: "Sifonn" }}
-                                  >
-                                    COIN TITLE
-                                  </Text>
-                                </div>
-                                <div className="detail-item">
-                                  <Text
-                                    fontSize={isMobile ? "10px" : "12px"}
-                                    fontWeight="500"
-                                    letterSpacing={"0.5px"}
-                                    lineHeight={"100%"}
-                                    color={"white"}
-                                    style={{ fontFamily: "Lora" }}
-                                  >
-                                    {pool.mktCap}
-                                  </Text>
-                                </div>
-                                <div className="detail-item">
-                                  <Text
-                                    fontSize={isMobile ? "10px" : "12px"}
-                                    fontWeight="500"
-                                    letterSpacing={"0.5px"}
-                                    lineHeight={"100%"}
-                                    color={"white"}
-                                    style={{ fontFamily: "Lora" }}
-                                  >
-                                    {pool.vol24h}
-                                  </Text>
-                                </div>
-                                {!isMobile && (
-                                  <>
-                                    <div className="detail-item">
-                                      <Text
-                                        fontSize="12px"
-                                        fontWeight="500"
-                                        letterSpacing={"0.5px"}
-                                        lineHeight={"100%"}
-                                        color={"white"}
-                                        style={{ fontFamily: "Lora" }}
-                                      >
-                                        {pool.allTime}
-                                      </Text>
-                                    </div>
-                                    <div className="detail-item">
-                                      <Text
-                                        fontSize="12px"
-                                        fontWeight="500"
-                                        letterSpacing={"0.5px"}
-                                        lineHeight={"100%"}
-                                        color={"white"}
-                                        style={{ fontFamily: "Lora" }}
-                                      >
-                                        {pool.tvl}
-                                      </Text>
-                                    </div>
-                                    <div className="detail-item">
-                                      <Text
-                                        fontSize="12px"
-                                        fontWeight="500"
-                                        letterSpacing={"0.5px"}
-                                        lineHeight={"100%"}
-                                        color={"white"}
-                                        style={{ fontFamily: "Lora" }}
-                                      >
-                                        {pool.dpr}
-                                      </Text>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                            <div
-                              style={{
-                                borderWidth: "1px",
-                                borderColor: "rgba(255, 255, 255, 0.3)",
-                                borderStyle: "solid",
-                                width: "100%",
-                                marginTop: "12px",
-                                marginBottom: "10px",
-                              }}
-                            />
-                            <div>
-                              <StyledPoolSubtext>
-                                <span className="fire-icon">🔥</span>
-                                <span className="hot-buy">+30.65%</span>
-                                <div className="badge-container">
-                                  <span className="badge">1% TO GREENPEACE</span>
-                                  <span className="info-circle">i</span>
-                                </div>
-                              </StyledPoolSubtext>
-                            </div>
-                          </div>
-                        </StyledPoolMainContent>
-                      </StyledPoolRow>
-                    ))
-                  ) : (
-                    <Text color="lightGray" textAlign="center" py="2rem" fontSize="14px">
-                      {activeTab === "my"
-                        ? "Connect your wallet to see your pools"
-                        : "No pools available at the moment"}
-                    </Text>
-                  )}
-                </StyledPoolsGrid>
+                {/* TABLE END  */}
+                <PoolsTableNew
+                  index={selectedIndex}
+                  data={markets}
+                  sortBy={(s) => {
+                    setSortBy(s);
+                    setPage(1);
+                    setAllDataIsLoaded(false);
+                  }}
+                  orderBy={(s) => {
+                    setOrderBy(s);
+                    setPage(1);
+                    setAllDataIsLoaded(false);
+                  }}
+                  onSelect={(index) => {
+                    setSelectedIndex(index);
+                  }}
+                  onEnd={() => {
+                    if (!allDataIsLoaded) {
+                      setPage(page + 1);
+                    }
+                  }}
+                />
               </StyledPoolsListCard>
             )}
           </StyledPoolsContainer>
@@ -650,7 +403,7 @@ const NewPoolContent = ({ initialData = {} }: { initialData?: NewPoolData }) => 
 };
 
 // Wrap the component with ErrorBoundary
-export const ClientNewPoolPage = (props: { initialData?: NewPoolData }) => {
+export const ClientNewPoolPage = (props: { initialData?: any[] }) => {
   return (
     <ErrorBoundary fallbackComponent={ErrorBoundaryFallback}>
       <NewPoolContent {...props} />

@@ -1,36 +1,66 @@
-import { ClientNewPoolPage } from "../../components/pages";
+import { type PoolsData } from "components/pages/pools/ClientPoolsPage";
+import { getPoolData } from "./api/getPoolDataQuery";
+import { symbolBytesToEmojis } from "@sdk/emoji_data/utils";
 import { type Metadata } from "next";
-import { emoji } from "utils";
+import { emoji, parseJSON } from "utils";
+import { getValidSortByForPoolsPage } from "@sdk/indexer-v2/queries/query-params";
+import { safeParsePageWithDefault, handleEmptySearchBytes } from "lib/routes/home-page-params";
+import ClientNewPoolPage from "components/pages/newPool/ClientNewPoolPage";
+import { getCoin } from "app/actions/createCoin";
 
 export const revalidate = 2;
 
 export const metadata: Metadata = {
-  title: "Pools | Movement Coins",
-  description: `Add liquidity to pools and earn rewards. We donate 1% of all pools to social causes.`,
+  title: "pools",
+  description: `Provide ${emoji("water wave")}liquidity${emoji("water wave")} and earn APR using your emojis !`,
 };
 
-// Define the type here since we can't import it directly
-type NewPoolData = {
-  // Add necessary properties here
-};
-
-type NewPoolSearchParams = {
-  baseEmoji: string | null;
-  quoteEmoji: string | null;
+type PoolsSearchParams = {
+  page: string | null;
+  sortby: string | null;
+  orderby: string | null;
+  searchBytes: string | null;
+  pool: string | null;
+  account: string | null;
 };
 
 /**
- * Pools page for viewing and creating new liquidity pools
+ * Uses the same exact parsing logic as the /pools/api route.
+ * @see {@link src/pools/api/route.ts}
  */
-export default async function NewPoolPage({ searchParams }: { searchParams: NewPoolSearchParams }) {
-  try {
-    // Here you would fetch any initial data needed for the pools page
-    // For now, we'll just pass an empty initialData
-    const initialData = {}; // Empty object works since we don't have required fields yet
+export default async function PoolsPage({ searchParams }: { searchParams: PoolsSearchParams }) {
+  const page = safeParsePageWithDefault(searchParams.page);
+  const sortBy = getValidSortByForPoolsPage(searchParams.sortby);
+  const orderBy = searchParams.orderby ?? "desc";
+  const q = handleEmptySearchBytes(searchParams.searchBytes);
+  const searchEmojis = q ? symbolBytesToEmojis(q).emojis.map((e) => e.emoji) : undefined;
 
-    return <ClientNewPoolPage initialData={initialData} />;
-  } catch (error) {
-    console.error("Error in NewPoolPage:", error);
-    throw error; // Let Next.js error boundaries handle it
+  if (orderBy !== "asc" && orderBy !== "desc") {
+    throw new Error("Invalid params");
   }
-} 
+
+  // The liquidity `provider`, aka the account to search for in the user liquidity pools.
+  const provider = searchParams.account;
+
+  const initialData: PoolsData[] = parseJSON(
+    await getPoolData(page, sortBy, orderBy, searchEmojis, provider ?? undefined)
+  );
+
+  // Add coin data to each pool
+  const poolsWithCoinData = await Promise.all(
+    initialData.map(async (pool) => {
+      const coin = await getCoin(pool?.market?.symbolData?.name);
+      return {
+        ...pool,
+        coinMeta: coin?.data
+          ? {
+              ...coin.data.meta,
+              titleSlug: coin.data.titleSlug,
+            }
+          : null,
+      };
+    })
+  );
+
+  return <ClientNewPoolPage initialData={poolsWithCoinData} />;
+}
