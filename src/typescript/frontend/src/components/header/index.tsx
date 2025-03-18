@@ -82,7 +82,7 @@ const Header = ({ isOpen, setIsOpen }: HeaderProps) => {
           </Link>
 
           {isDesktop && (
-            <FlexGap marginRight="10px" gap="50px" alignItems="center">
+            <FlexGap gap="10px" alignItems="center">
               {linksForCurrentPage.map(({ title, path, width }) => {
                 return (
                   <Link
