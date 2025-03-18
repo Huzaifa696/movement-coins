@@ -59,7 +59,7 @@ export const Th = styled.td<TdProps>`
   background-color: ${({ theme }) => theme.colors.black};
   z-index: 1;
   text-transform: uppercase;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.darkGray};
+  // border-bottom: 1px solid ${({ theme }) => theme.colors.darkGray};
   align-content: center;
 
   &:nth-child(1) {
@@ -99,6 +99,18 @@ export const Tr = styled.tr<TrProps>`
 export const EmptyTr = styled.tr<TrProps>`
   border-top: 1px solid ${({ theme }) => theme.colors.darkGray};
   border-bottom: 1px solid ${({ theme }) => theme.colors.transparent};
+  display: flex;
+  width: 100%;
+  min-height: 34px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  ${layout}
+`;
+
+export const EmptyTrWithoutBorder = styled.tr<TrProps>`
   display: flex;
   width: 100%;
   min-height: 34px;
