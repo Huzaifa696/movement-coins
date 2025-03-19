@@ -234,40 +234,6 @@ export const StyledAddLiquidityTitle = styled.div`
   }
 `;
 
-
-export const StyledAddLiquidityContainer= styled.div`
-  // background: rgba(0, 0, 0, 0.3);
-  // border-radius: 1rem;
-  // padding: 1.5rem;
-  // margin-top: 10px;
-  // position: relative;
-  // height: fit-content;
-  // border: 2px solid white;
-  // width: 100%;
-  // max-width: 320px;
-
-  // ${mobileStyle(`
-  //   max-width: 100%;
-  //   padding: 1.2rem;
-  // `)}
-
-  // h2 {
-  //   display: none; /* Hide the heading inside the card since we moved it outside */
-  // }
-
-  // .token-icon {
-  //   width: 38px;
-  //   height: 38px;
-  //   border-radius: 50%;
-  //   display: flex;
-  //   align-items: center;
-  //   justify-content: center;
-  //   color: white;
-  //   font-weight: bold;
-  //   font-size: 1rem;
-  // }
-`;
-
 export const StyledAddLiquidityCard = styled.div`
   background: rgba(0, 0, 0, 0.3);
   border-radius: 1rem;
@@ -388,7 +354,7 @@ export const StyledPoolMainContent = styled.div`
   padding-right: 10px;
   min-height: 72px;
   width: 100%;
-  cursor: pointer;
+
   ${mobileStyle(`
     min-height: 60px;
     flex-wrap: nowrap;

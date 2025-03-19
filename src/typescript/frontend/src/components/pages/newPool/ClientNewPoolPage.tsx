@@ -4,9 +4,7 @@ import { FlexGap } from "@containers";
 import { ErrorBoundary, ErrorBoundaryFallback, Heading, Text } from "components";
 import { useEffect, useState } from "react";
 import {
-  StyledAddLiquidityButton,
   StyledAddLiquidityCard,
-  StyledAddLiquidityContainer,
   StyledAddLiquidityTitle,
   StyledContentWrapper,
   StyledForm,
@@ -30,9 +28,6 @@ import { encodeEmojis, getEmojisInString, type SymbolEmoji } from "@sdk/emoji_da
 import { DEFAULT_POOLS_SORT_BY } from "@sdk/indexer-v2/queries/query-params";
 import PoolsTableNew from "../pools/components/pools-table/PoolsTableNew";
 import { getCoin } from "app/actions/createCoin";
-import { StyledInner } from "../pools/styled";
-import { Liquidity } from "../pools/components";
-import LiquidityNew from "../pools/components/liquidity/LiquidityNew";
 
 const NewPoolContent = ({ initialData = [] }: { initialData?: PoolsData[] }) => {
   const mobileMenuOpen = false;
@@ -114,15 +109,6 @@ const NewPoolContent = ({ initialData = [] }: { initialData?: PoolsData[] }) => 
           <Heading as="h1" scale="h1">
             POOLS
           </Heading>
-          <Text
-            style={{
-              marginTop: isMobile ? "10px" : "30px",
-              marginBottom: isMobile ? "10px" : "30px",
-            }}
-            fontSize={isMobile ? "12px" : "19px"}
-          >
-            All our pools help social causes. We donate 1% of all
-          </Text>
         </StyledHeader>
 
         <FlexGap flexDirection="column" width="100%">
@@ -164,15 +150,101 @@ const NewPoolContent = ({ initialData = [] }: { initialData?: PoolsData[] }) => 
                   .
                 </Text>
               </StyledAddLiquidityTitle>
-              <StyledAddLiquidityContainer
+
+              <StyledAddLiquidityCard
                 style={{
                   maxWidth: isMobile ? "100%" : "320px",
                 }}
               >
-                <LiquidityNew
-                  market={selectedIndex !== undefined ? markets[selectedIndex] : undefined}
-                />
-              </StyledAddLiquidityContainer>
+                <StyledForm>
+                  <FlexGap alignItems="center" gap="15px">
+                    <div className="token-icon">
+                      <img src="/images/pool/Aptos_White.png" alt="APT" />
+                    </div>
+                    <div>
+                      <Text fontWeight="700" fontSize="15px" color="white">
+                        100 APT
+                      </Text>
+                      <Text fontSize="10px" color="white" mt="2px" fontWeight="400">
+                        Your balance
+                      </Text>
+                    </div>
+                  </FlexGap>
+
+                  <div className="info-item">
+                    <Text color="white" fontSize="15px" fontWeight="400">
+                      You Deposit: 1
+                    </Text>
+                    <div className="horizontal-line"></div>
+                  </div>
+
+                  <div className="info-item">
+                    <Text color="white" fontSize="15px" fontWeight="400">
+                      You Receive: 1
+                    </Text>
+                    <div className="horizontal-line"></div>
+                  </div>
+
+                  <div className="info-item">
+                    <Text color="white" fontSize="15px" fontWeight="400">
+                      You Get: 1
+                    </Text>
+                    <div className="horizontal-line"></div>
+                  </div>
+
+                  {/* {successMessage && (
+                    <Text
+                      color="lightGray"
+                      mt="10px"
+                      fontWeight="bold"
+                      fontSize="12px"
+                      style={{ color: "#44FF44" }}
+                    >
+                      {successMessage}
+                    </Text>
+                  )} */}
+
+                  {/* {errorMessage && (
+                    <Text
+                      color="lightGray"
+                      mt="10px"
+                      fontWeight="bold"
+                      fontSize="12px"
+                      style={{ color: "#FF4444" }}
+                    >
+                      {errorMessage}
+                    </Text>
+                  )} */}
+
+                  {/* <StyledAddLiquidityButton onClick={handleCreatePool} disabled={isCreating}>
+                    {isCreating ? "Processing..." : "ADD LIQUIDITY"}
+                  </StyledAddLiquidityButton> */}
+                </StyledForm>
+              </StyledAddLiquidityCard>
+
+              <Heading
+                as="h2"
+                scale="h2"
+                style={{
+                  marginTop: "2rem",
+                  marginBottom: "1rem",
+                  fontSize: isMobile ? "20px" : "25px",
+                  color: "white",
+                  textTransform: "uppercase",
+                  fontWeight: "700",
+                  fontFamily: "Sifonn",
+                }}
+              >
+                RESERVES
+              </Heading>
+
+              <StyledReservesCard
+                style={{
+                  maxWidth: isMobile ? "100%" : "320px",
+                }}
+              >
+                {/* The horizontal line is now built into the card styling */}
+              </StyledReservesCard>
             </div>
 
             {/* Right side - Pools List */}
