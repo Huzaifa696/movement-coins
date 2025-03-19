@@ -31,7 +31,7 @@ const TableRowDesktopNew: React.FC<TableRowDesktopProps> = ({ item, selected, on
   const dpr = useMemo(() => formatXPR(1, bigDailyTvl), [bigDailyTvl]);
 
   return (
-    <StyledPoolRow>
+    <StyledPoolRow onClick={onClick}>
       <StyledPoolMainContent>
         <div className="pool-icon">
           <img src={item?.coinMeta?.imageURL ?? "/images/pool/Aptos_White.png"} alt="Coin" />
