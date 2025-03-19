@@ -22,9 +22,13 @@ import { encodeEmojis, getEmojisInString, type SymbolEmoji } from "@sdk/emoji_da
 import SearchBar from "components/inputs/search-bar";
 import { type MarketStateModel, type UserPoolsRPCModel } from "@sdk/indexer-v2/types";
 import { DEFAULT_POOLS_SORT_BY } from "@sdk/indexer-v2/queries/query-params";
+import { type Meta } from "@prisma/client";
 
-export type PoolsData = MarketStateModel | UserPoolsRPCModel;
+type Pool = MarketStateModel | UserPoolsRPCModel;
 
+export type PoolsData = Pool & {
+  coinMeta?: Meta;
+};
 export const ClientPoolsPage = ({ initialData }: { initialData: PoolsData[] }) => {
   const searchParams = useSearchParams();
   const poolParam = searchParams.get("pool");

@@ -77,55 +77,38 @@ const Chart: React.FC<ChartProps> = ({ title, data, height = 300 }) => {
       height: height,
     });
 
-    // Add area series for the main price chart
-    const areaSeries = chart.addAreaSeries({
-      lineColor: "#00BCD4",
-      topColor: "rgba(0, 188, 212, 0.4)",
-      bottomColor: "rgba(0, 188, 212, 0)",
-      lineWidth: 2,
+    // Add candlestick series with increased precision
+    const candlestickSeries = chart.addCandlestickSeries({
       priceFormat: {
-        type: "price",
+        type: 'price',
         precision: 8,
         minMove: 0.00000001,
       },
     });
 
-    // Add volume series
-    const volumeSeries = chart.addHistogramSeries({
-      color: "#00BCD4",
-      priceFormat: {
-        type: "volume",
-      },
-      priceScaleId: "volume"
-    });
-
-    chart.priceScale("volume").applyOptions({
-      scaleMargins: {
-        top: 0.8,
-        bottom: 0,
-      },
-      alignLabels: true,
-    });
-
-    // Transform data for area series
-    const areaData = filteredData.map((d) => ({
+    // Transform data for candlestick series
+    const candlestickData = filteredData.map((d) => ({
       time: d.time as Time,
-      value: d.close,
+      open: d.open,
+      high: d.high,
+      low: d.low,
+      close: d.close,
     }));
 
-    // Transform data for volume series
-    const volumeData = filteredData.map((d) => ({
-      time: d.time as Time,
-      value: d.volume || 0,
-      color: d.close >= d.open ? "#00BCD4" : "#E91E63",
-    }));
-
-    areaSeries.setData(areaData);
-    volumeSeries.setData(volumeData);
+    candlestickSeries.setData(candlestickData);
     chartRef.current = chart;
 
     // Fit the content after setting data
     chart.timeScale().fitContent();
+
+    // Ensure hover data is displayed with correct precision
+    chart.subscribeCrosshairMove((param) => {
+      if (!param || !param.seriesData) return;
+      const data = param.seriesData.get(candlestickSeries);
+      if (data && 'open' in data && 'high' in data && 'low' in data && 'close' in data) {
+        console.log(`Open: ${data.open.toFixed(8)}, High: ${data.high.toFixed(8)}, Low: ${data.low.toFixed(8)}, Close: ${data.close.toFixed(8)}`);
+      }
+    });
 
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {

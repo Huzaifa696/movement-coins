@@ -6,7 +6,7 @@ import { useMatchBreakpoints } from "hooks";
 
 import { FlexGap, Flex } from "@containers";
 import { Text } from "components/text";
-import Info from "components/info";
+// import Info from "components/info";
 import { Arrows } from "components/svg";
 
 import { type TableHeaderProps } from "./types";
@@ -22,7 +22,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({ item, isLast, onClick }) => {
   });
 
   return (
-    <Flex>
+    <Flex >
       <FlexGap
         cursor={item.sortBy ? "pointer" : undefined}
         gap="10px"
@@ -32,7 +32,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({ item, isLast, onClick }) => {
         onMouseEnter={replay}
         ellipsis
       >
-        {isLast && (
+        {/* {isLast && (
           <Info>
             <div>
               <FlexGap gap=".2rem" justifyContent="space-between">
@@ -53,11 +53,11 @@ const TableHeader: React.FC<TableHeaderProps> = ({ item, isLast, onClick }) => {
               </FlexGap>
             </div>
           </Info>
-        )}
+        )} */}
         <Text
           textScale="bodyLarge"
           textTransform="uppercase"
-          color="econiaBlue"
+          color="white"
           $fontWeight="regular"
           ellipsis
           ref={ref}
@@ -66,7 +66,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({ item, isLast, onClick }) => {
         </Text>
         {item.sortBy && !isMobile ? (
           <Flex>
-            <Arrows color="econiaBlue" />
+            <Arrows color="white" />
           </Flex>
         ) : null}
       </FlexGap>
