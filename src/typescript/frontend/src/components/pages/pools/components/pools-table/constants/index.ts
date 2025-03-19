@@ -1,11 +1,11 @@
 export const HEADERS = [
   {
     width: "12%",
-    text: "Pool",
+    text: "Name",
   },
   {
     width: "26%",
-    text: "All-time volume",
+    text: "MKT CAP",
     sortBy: "all_time_vol",
   },
   {
@@ -25,14 +25,50 @@ export const HEADERS = [
   },
 ];
 
-export const MOBILE_HEADERS = [
+export const HEADERS_NEW = [
   {
-    width: "25%",
-    text: "Pool",
+    width: "15%",
+    text: "",
+  },
+  {
+    width: "28%",
+    text: "Name",
   },
   {
     width: "30%",
-    text: "All-time vol",
+    text: "MKT CAP",
+    sortBy: "all_time_vol",
+  },
+  {
+    width: "18%",
+    text: "24h vol",
+    sortBy: "daily_vol",
+  },
+  {
+    width: "18%",
+    text: "All time",
+    sortBy: "all_time_vol",
+  },
+  {
+    width: "20%",
+    text: "Tvl",
+    sortBy: "tvl",
+  },
+  {
+    width: "24%",
+    text: "Dpr",
+    sortBy: "apr",
+  },
+];
+
+export const MOBILE_HEADERS = [
+  {
+    width: "25%",
+    text: "Name",
+  },
+  {
+    width: "30%",
+    text: "MKT CAP",
     sortBy: "all_time_vol",
   },
   {
