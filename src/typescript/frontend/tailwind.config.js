@@ -63,7 +63,7 @@ module.exports = {
       green: "#2FA90F",
       pink: "#CD2F8D",
       error: "#CD2F8D",
-      "ec-blue": "#086CD9",
+      "ec-blue": "#A562FF",
       warning: "#FFB119",
       red: "#F3263E",
       transparent: "transparent",

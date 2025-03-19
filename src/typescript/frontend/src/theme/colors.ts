@@ -11,7 +11,7 @@ export const lightColors = {
   blue: "#64A7FF",
   green: "#2FA90F",
   pink: "#CD2F8D",
-  econiaBlue: "#086CD9",
+  econiaBlue: "#A562FF",
   warning: "#FFB119",
   error: "#F3263E",
 } as const;
@@ -25,7 +25,7 @@ export const darkColors = {
   blue: "#64A7FF",
   green: "#2FA90F",
   pink: "#CD2F8D",
-  econiaBlue: "#086CD9",
+  econiaBlue: "#A562FF",
   warning: "#FFB119",
   error: "#F3263E",
 } as const;
@@ -37,6 +37,6 @@ export const BLACK = "#000000";
 export const BLUE = "#64A7FF";
 export const GREEN = "#2FA90F";
 export const PINK = "#CD2F8D";
-export const ECONIA_BLUE = "#086CD9";
+export const ECONIA_BLUE = "#A562FF";
 export const WARNING = "#FFB119";
 export const ERROR_RED = "#F3263E";
