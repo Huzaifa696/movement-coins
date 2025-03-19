@@ -75,7 +75,7 @@ const Icon: React.FC<SvgProps & { versionBadge?: boolean }> = ({
           d="M979.7 103.4V0.599609H1009.1V15.2996H1023.8V29.9996H1038.5V44.6996H1053.2V0.599609H1082.6V103.4H1053.2V73.9996H1038.5V59.2996H1023.8V44.5996H1009.1V103.3H979.7V103.4Z"
           fill={theme.colors[color]}
         />
-        <path d="M1105.8 103.4V74H1135.2V103.4H1105.8Z" fill="#A562FF" />
+        <path d="M1105.8 103.4V74H1135.2V103.4H1105.8Z" fill="#086CD9" />
         <path
           d="M1158.4 103.4V0.599609H1261.2V15.2996H1187.8V44.6996H1246.5V59.3996H1187.8V103.5H1158.4V103.4Z"
           fill={theme.colors[color]}
