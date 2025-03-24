@@ -41,6 +41,9 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
   const { registerMarket, cost } = useRegisterMarket();
   const { invalid: isEmojiSelected, registered } = useIsMarketRegistered();
 
+  // Add state for title slug for URLs
+  const [titleSlug, setTitleSlug] = useState<string>("");
+
   const isValidImageURL = useCallback((url: string) => {
     try {
       new URL(url);
@@ -103,6 +106,13 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [emojis]);
 
+  // Generate slugified version of title
+  useEffect(() => {
+    if (launchCoinData.title) {
+      setTitleSlug(launchCoinData.title.toLowerCase().replace(/\s+/g, '-'));
+    }
+  }, [launchCoinData.title]);
+
   const handleClick = async () => {
     if (!invalid && !registered) {
       await registerMarket(launchCoinData);
@@ -121,7 +131,7 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
   return (
     <AnimatePresence initial={false} mode="wait">
       {launchCoinData?.image?.length > 0 && (
-        <Image src={launchCoinData.image} alt="Picture of the author" width={250} height={250} />
+        <Image src={launchCoinData.image} alt={launchCoinData.title || "Coin image"} width={250} height={250} />
       )}
       {/* Input */}
       {!loading ? (
@@ -134,15 +144,10 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
         >
           <div className="flex relative mb-1">
             <div className="flex flex-col grow relative w-full">
-              <EmojiPickerWithInput
-                handleClick={handleClick}
-                inputClassName="!border !border-solid !border-light-gray rounded-md !flex-row-reverse pl-3 pr-1.5"
-                inputGroupProps={{ label: "Select Emojis", scale: "xm" }}
-              />
-
               <h3 className="body-md text-light-gray md:body-lg uppercase font-forma my-4">
                 Coin Details
               </h3>
+              
               {/* Title Input */}
               <input
                 type="text"
@@ -172,15 +177,27 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
                 }
               />
 
-              {/* Non-Profit Name Input */}
-              <div className="flex flex-col mt-4">
+              {/* Emoji selection for icon */}
+              <div className="my-4">
+                <h4 className="body-md text-light-gray uppercase font-forma">Coin Icon Emoji</h4>
+                <EmojiPickerWithInput
+                  handleClick={handleClick}
+                  inputClassName="!border !border-solid !border-light-gray rounded-md !flex-row-reverse pl-3 pr-1.5"
+                  inputGroupProps={{ label: "Select Emojis", scale: "xm" }}
+                />
+              </div>
+
+              {/* Non-Profit Section */}
+              <div className="mt-4">
                 <h3 className="body-md text-light-gray md:body-lg uppercase font-forma my-4">
-                  Non-Profit Details
+                  Non-Profit Integration (Optional)
                 </h3>
+                
+                {/* Non-Profit Name Input */}
                 <input
                   type="text"
                   placeholder="Enter Non-Profit Name"
-                  className="p-3 !border !border-solid !border-light-gray rounded-md"
+                  className="mt-4 p-3 !border !border-solid !border-light-gray rounded-md"
                   value={launchCoinData.nonProfitName}
                   onChange={(e) =>
                     setLaunchCoinData({ ...launchCoinData, nonProfitName: e.target.value })
@@ -222,8 +239,10 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
               </div>
             </div>
           </div>
+
           <MarketValidityIndicator
             className={
+              launchCoinData.title &&
               emojis.length !== 0 &&
               numBytes <= 10 &&
               (registered || typeof registered === "undefined")
@@ -232,15 +251,16 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
             }
             registered={registered}
           />
+
           <div className="flex">
-            <div className={labelClassName}>{t("Emojicoin Name:")}</div>
+            <div className={labelClassName}>{t("Coin Name:")}</div>
             <div className="body-sm md:body-lg uppercase ellipses text-white font-forma ml-[0.5ch]">
-              {emojis.map((e) => SYMBOL_EMOJI_DATA.byEmoji(e)?.name).join(", ")}
+              {launchCoinData.title || "-"}
             </div>
           </div>
 
           <div className="flex">
-            <div className={labelClassName}>{t("Emojicoin Symbol:")}</div>
+            <div className={labelClassName}>{t("Coin Icon:")}</div>
             <Emoji
               className={
                 "body-sm md:body-lg uppercase whitespace-normal text-ellipsis text-white font-forma " +
@@ -249,6 +269,7 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
               emojis={emojis.join("")}
             />
           </div>
+
           <div className="flex flex-col justify-center m-auto pt-2 pixel-heading-4 uppercase">
             <div className="flex flex-col text-dark-gray">
               <div className="flex flex-row justify-between">
@@ -310,12 +331,13 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
             className={"flex flex-col justify-center m-auto mt-[1ch]"}
             initial={{ opacity: 0.4 }}
             animate={{
-              opacity: emojis.length === 0 || numBytes > 10 ? 0.4 : 1,
+              opacity: !launchCoinData.title || emojis.length === 0 || numBytes > 10 ? 0.4 : 1,
             }}
           >
             <LaunchButtonOrGoToMarketLink
-              invalid={invalid}
+              invalid={invalid || !launchCoinData.title}
               registered={registered}
+              titleSlug={titleSlug}
               onWalletButtonClick={() => {
                 registerMarket(launchCoinData);
               }}
@@ -332,7 +354,7 @@ export const MemoizedLaunchAnimation = ({ loading }: { loading: boolean }) => {
           className="absolute flex flex-col justify-center items-center w-full h-full gap-6"
         >
           <span ref={ref} className="pixel-heading-3 text-ec-blue uppercase">
-            Building your emojicoin...
+            Building your coin...
           </span>
         </motion.div>
       )}

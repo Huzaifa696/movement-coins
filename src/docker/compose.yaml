@@ -83,7 +83,6 @@ services:
     depends_on:
       postgres:
         condition: 'service_healthy'
-    image: 'econialabs/emojicoin-dot-fun-indexer-processor'
     container_name: 'processor'
     healthcheck:
       test: 'curl -sf http://localhost:${PROCESSOR_WS_PORT} || exit 1'

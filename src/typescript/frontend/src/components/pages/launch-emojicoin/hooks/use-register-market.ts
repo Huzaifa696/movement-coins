@@ -18,6 +18,8 @@ import { useNumMarkets } from "lib/hooks/queries/use-num-markets";
 import { useQuery } from "@tanstack/react-query";
 import { type AccountInfo } from "@aptos-labs/wallet-adapter-core";
 import { createCoin } from "app/actions/createCoin";
+import { stringToHex } from "utils/string-to-hex";
+// import { stringToHex } from "@/utils/string-to-hex";
 
 export const tryEd25519PublicKey = (account: AccountInfo) => {
   try {
@@ -40,6 +42,7 @@ export const useRegisterMarket = () => {
 
   const { data: numMarkets } = useNumMarkets();
 
+  // This is now used just for tracking whether the emoji is valid, but not for actual registration
   const emojiBytes = emojis.map((e) => SYMBOL_EMOJI_DATA.byEmoji(e)!.bytes);
 
   const { data: gasResult } = useQuery({
@@ -59,11 +62,14 @@ export const useRegisterMarket = () => {
         };
       }
       try {
+        // For gas estimation, we'll use a simple title string based on the emoji
+        const titleBytes = stringToHex(emojis.join(''));
+        
         const r = await RegisterMarket.getGasCost({
           aptosConfig: aptos.config,
           registrant: account.address,
           registrantPubKey: publicKey,
-          emojis: numMarkets === 0 ? [SYMBOL_EMOJI_DATA.byName("Virgo")!.bytes] : emojiBytes,
+          titleBytes,
         });
         return r;
       } catch (e) {
@@ -108,12 +114,29 @@ export const useRegisterMarket = () => {
     setPickerInvisible(true);
     let res: PendingTransactionResponse | UserTransactionResponse | undefined | null;
     let error: unknown;
+    
+    // Convert string fields to hex format for the contract
+    const titleBytes = stringToHex(launchCoinData.title);
+    const descriptionBytes = stringToHex(launchCoinData.description);
+    const imageUrlBytes = stringToHex(launchCoinData.image);
+    const nonProfitNameBytes = stringToHex(launchCoinData.nonProfitName || '');
+    const nonProfitDescriptionBytes = stringToHex(launchCoinData.nonProfitDescription || '');
+    const nonProfitImageUrlBytes = stringToHex(launchCoinData.nonProfitImage || '');
+    const nonProfitLinkBytes = stringToHex(launchCoinData.nonProfitLink || '');
+    
     const builderArgs = {
       aptosConfig: aptos.config,
       registrant: account.address,
-      emojis: emojiBytes,
+      titleBytes,
+      descriptionBytes,
+      imageUrlBytes,
+      nonProfitNameBytes,
+      nonProfitDescriptionBytes,
+      nonProfitImageUrlBytes,
+      nonProfitLinkBytes,
       integrator: INTEGRATOR_ADDRESS,
     };
+    
     const builderLambda = () =>
       RegisterMarket.builder({
         ...builderArgs,
@@ -128,7 +151,7 @@ export const useRegisterMarket = () => {
     });
 
     if (res && isUserTransactionResponse(res)) {
-      // Call server action to create coin in database
+      // We still create a slug from emojis for URL purposes
       const emojiSlug = emojis.map((e) => SYMBOL_EMOJI_DATA.byEmoji(e)!.name).join("-");
       await createCoin({
         data: res,

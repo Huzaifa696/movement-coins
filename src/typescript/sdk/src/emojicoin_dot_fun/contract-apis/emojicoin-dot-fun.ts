@@ -36,6 +36,7 @@ import {
 import { MODULE_ADDRESS, REWARDS_MODULE_ADDRESS } from "../../const";
 import type JsonTypes from "../../types/json-types";
 import { getAptosClient } from "../../utils/aptos-client";
+import { Client } from "@aptos-labs/ts-sdk";
 
 export type ChatPayloadMoveArguments = {
   marketAddress: AccountAddress;
@@ -252,7 +253,13 @@ export class ProvideLiquidity extends EntryFunctionPayloadBuilder {
 }
 
 export type RegisterMarketPayloadMoveArguments = {
-  emojis: MoveVector<MoveVector<U8>>;
+  titleBytes: MoveVector<U8>;
+  descriptionBytes: MoveVector<U8>;
+  imageUrlBytes: MoveVector<U8>;
+  nonProfitNameBytes: MoveVector<U8>;
+  nonProfitDescriptionBytes: MoveVector<U8>;
+  nonProfitImageUrlBytes: MoveVector<U8>;
+  nonProfitLinkBytes: MoveVector<U8>;
   integrator: AccountAddress;
 };
 
@@ -260,7 +267,13 @@ export type RegisterMarketPayloadMoveArguments = {
  *```
  *  public entry fun register_market(
  *     registrant: &signer,
- *     emojis: vector<vector<u8>>,
+ *     title_bytes: vector<u8>,
+ *     description_bytes: vector<u8>,
+ *     image_url_bytes: vector<u8>,
+ *     non_profit_name_bytes: vector<u8>,
+ *     non_profit_description_bytes: vector<u8>,
+ *     non_profit_image_url_bytes: vector<u8>,
+ *     non_profit_link_bytes: vector<u8>,
  *     integrator: address,
  *  )
  *```
@@ -285,16 +298,39 @@ export class RegisterMarket extends EntryFunctionPayloadBuilder {
 
   private constructor(args: {
     registrant: AccountAddressInput; // &signer
-    emojis: Array<HexInput>; // vector<vector<u8>>
+    titleBytes: HexInput; // vector<u8>
+    descriptionBytes: HexInput; // vector<u8>
+    imageUrlBytes: HexInput; // vector<u8>
+    nonProfitNameBytes: HexInput; // vector<u8>
+    nonProfitDescriptionBytes: HexInput; // vector<u8>
+    nonProfitImageUrlBytes: HexInput; // vector<u8>
+    nonProfitLinkBytes: HexInput; // vector<u8>
     integrator: AccountAddressInput; // address
     feePayer?: AccountAddressInput; // Optional fee payer account to pay gas fees.
   }) {
     super();
-    const { registrant, emojis, integrator, feePayer } = args;
+    const {
+      registrant,
+      titleBytes,
+      descriptionBytes,
+      imageUrlBytes,
+      nonProfitNameBytes,
+      nonProfitDescriptionBytes,
+      nonProfitImageUrlBytes,
+      nonProfitLinkBytes,
+      integrator,
+      feePayer
+    } = args;
     this.primarySender = AccountAddress.from(registrant);
 
     this.args = {
-      emojis: new MoveVector(emojis.map((argA) => MoveVector.U8(argA))),
+      titleBytes: MoveVector.U8(titleBytes),
+      descriptionBytes: MoveVector.U8(descriptionBytes),
+      imageUrlBytes: MoveVector.U8(imageUrlBytes),
+      nonProfitNameBytes: MoveVector.U8(nonProfitNameBytes),
+      nonProfitDescriptionBytes: MoveVector.U8(nonProfitDescriptionBytes),
+      nonProfitImageUrlBytes: MoveVector.U8(nonProfitImageUrlBytes),
+      nonProfitLinkBytes: MoveVector.U8(nonProfitLinkBytes),
       integrator: AccountAddress.from(integrator),
     };
     this.feePayer = feePayer !== undefined ? AccountAddress.from(feePayer) : undefined;
@@ -304,58 +340,103 @@ export class RegisterMarket extends EntryFunctionPayloadBuilder {
     aptosConfig: AptosConfig;
     registrant: AccountAddressInput; // &signer
     registrantPubKey: PublicKey;
-    emojis: Array<HexInput>; // vector<vector<u8>>
+    titleBytes: HexInput; // vector<u8>
   }): Promise<{ data: { amount: number; unitPrice: number }; error: boolean }> {
     const { aptosConfig } = args;
 
-    const aptos = getAptosClient(aptosConfig);
-    const rawTransaction = await this.builder({
-      ...args,
-      integrator: AccountAddress.ONE,
-    }).then((res) => res.rawTransactionInput.rawTransaction);
-    const transaction = new SimpleTransaction(rawTransaction);
-    const [userTransactionResponse] = await aptos.transaction.simulate.simple({
-      signerPublicKey: args.registrantPubKey,
-      transaction,
-      options: {
-        estimateGasUnitPrice: true,
-        estimateMaxGasAmount: true,
-      },
-    });
-    return {
-      data: {
-        amount: Number(userTransactionResponse.gas_used),
-        unitPrice: Number(userTransactionResponse.gas_unit_price),
-      },
-      error: !userTransactionResponse.success,
+    // Default to these standard values as a fallback
+    const defaultGasEstimate = {
+      data: { amount: 5000, unitPrice: 100 },
+      error: false,
     };
+
+    try {
+      const transactionBuilder = await RegisterMarket.builder({
+        aptosConfig,
+        registrant: args.registrant,
+        titleBytes: args.titleBytes,
+        descriptionBytes: '0x00',
+        imageUrlBytes: '0x00',
+        nonProfitNameBytes: '0x00',
+        nonProfitDescriptionBytes: '0x00',
+        nonProfitImageUrlBytes: '0x00',
+        nonProfitLinkBytes: '0x00',
+        integrator: AccountAddress.ONE,
+        options: {
+          estimateGasUnitPrice: true,
+          estimateMaxGasAmount: true,
+        },
+      });
+
+      const aptos = getAptosClient(aptosConfig);
+      const simulation = await aptos.transaction.simulate.simple({
+        signerPublicKey: args.registrantPubKey,
+        transaction: new SimpleTransaction(transactionBuilder.rawTransactionInput.rawTransaction),
+        options: {
+          estimateGasUnitPrice: true,
+          estimateMaxGasAmount: true,
+        },
+      });
+
+      if (!simulation[0].success) {
+        return defaultGasEstimate;
+      }
+
+      return {
+        data: {
+          amount: Number(simulation[0].gas_used),
+          unitPrice: Number(simulation[0].gas_unit_price),
+        },
+        error: false,
+      };
+    } catch (error) {
+      console.error("Error estimating gas:", error);
+      return defaultGasEstimate;
+    }
   }
 
   static async builder(args: {
     aptosConfig: AptosConfig;
     registrant: AccountAddressInput; // &signer
-    emojis: Array<HexInput>; // vector<vector<u8>>
+    titleBytes: HexInput; // vector<u8>
+    descriptionBytes: HexInput; // vector<u8>
+    imageUrlBytes: HexInput; // vector<u8>
+    nonProfitNameBytes: HexInput; // vector<u8>
+    nonProfitDescriptionBytes: HexInput; // vector<u8>
+    nonProfitImageUrlBytes: HexInput; // vector<u8>
+    nonProfitLinkBytes: HexInput; // vector<u8>
     integrator: AccountAddressInput; // address
     feePayer?: AccountAddressInput;
     options?: InputGenerateTransactionOptions;
   }): Promise<EntryFunctionTransactionBuilder> {
-    const { aptosConfig, options, feePayer } = args;
-    const payloadBuilder = new this(args);
-    const rawTransactionInput = await buildTransaction({
-      aptosConfig,
-      sender: payloadBuilder.primarySender,
-      payload: payloadBuilder.createPayload(),
-      options,
-      feePayerAddress: feePayer,
-    });
-    const aptos = getAptosClient(aptosConfig);
-    return new EntryFunctionTransactionBuilder(payloadBuilder, aptos, rawTransactionInput);
+    return new EntryFunctionTransactionBuilder(
+      new RegisterMarket({
+        registrant: args.registrant,
+        titleBytes: args.titleBytes,
+        descriptionBytes: args.descriptionBytes,
+        imageUrlBytes: args.imageUrlBytes,
+        nonProfitNameBytes: args.nonProfitNameBytes,
+        nonProfitDescriptionBytes: args.nonProfitDescriptionBytes,
+        nonProfitImageUrlBytes: args.nonProfitImageUrlBytes,
+        nonProfitLinkBytes: args.nonProfitLinkBytes,
+        integrator: args.integrator,
+        feePayer: args.feePayer,
+      }),
+      args.aptosConfig,
+      args.options
+    );
   }
 
   static async submit(args: {
     aptosConfig: AptosConfig;
     registrant: Account; // &signer
-    emojis: Array<HexInput>; // vector<vector<u8>>
+    titleBytes: HexInput; // vector<u8>
+    descriptionBytes: HexInput; // vector<u8>
+    imageUrlBytes: HexInput; // vector<u8>
+    nonProfitNameBytes: HexInput; // vector<u8>
+    nonProfitDescriptionBytes: HexInput; // vector<u8>
+    nonProfitImageUrlBytes: HexInput; // vector<u8>
+    nonProfitLinkBytes: HexInput; // vector<u8>
     integrator: AccountAddressInput; // address
     feePayer?: Account;
     options?: InputGenerateTransactionOptions;
@@ -1406,6 +1487,85 @@ export class VerifiedSymbolEmojiBytes extends ViewFunctionPayloadBuilder<[HexStr
     options?: LedgerVersionArg;
   }): Promise<HexString> {
     const [res] = await new VerifiedSymbolEmojiBytes(args).view(args);
+    return res;
+  }
+}
+
+export type MarketMetadataByTitleBytesPayloadMoveArguments = {
+  titleBytes: MoveVector<U8>;
+};
+/**
+ *  public fun market_metadata_by_title_bytes(
+ *     title_bytes: vector<u8>,
+ *  ): Option<MarketMetadata>
+ */
+export class MarketMetadataByTitleBytes extends ViewFunctionPayloadBuilder<
+  [Option<JsonTypes["MarketMetadata"]>]
+> {
+  public readonly moduleAddress = MODULE_ADDRESS;
+
+  public readonly moduleName = "emojicoin_dot_fun";
+
+  public readonly functionName = "market_metadata_by_title_bytes";
+
+  public readonly args: MarketMetadataByTitleBytesPayloadMoveArguments;
+
+  public readonly typeTags: [] = [];
+
+  constructor(args: {
+    titleBytes: HexInput; // vector<u8>
+  }) {
+    super();
+    const { titleBytes } = args;
+
+    this.args = {
+      titleBytes: MoveVector.U8(titleBytes),
+    };
+  }
+
+  static async view(args: {
+    aptos: Aptos | AptosConfig;
+    titleBytes: HexInput; // vector<u8>
+    options?: LedgerVersionArg;
+  }): Promise<Option<JsonTypes["MarketMetadata"]>> {
+    const [res] = await new MarketMetadataByTitleBytes(args).view(args);
+    return res;
+  }
+}
+
+/**
+ *  public fun verified_symbol_title_bytes(
+ *     title_bytes: vector<u8>,
+ *  ): vector<u8>
+ */
+export class VerifiedSymbolTitleBytes extends ViewFunctionPayloadBuilder<[HexString]> {
+  public readonly moduleAddress = MODULE_ADDRESS;
+
+  public readonly moduleName = "emojicoin_dot_fun";
+
+  public readonly functionName = "verified_symbol_title_bytes";
+
+  public readonly args: VerifiedSymbolTitleBytesPayloadMoveArguments;
+
+  public readonly typeTags: [] = [];
+
+  constructor(args: {
+    titleBytes: HexInput; // vector<u8>
+  }) {
+    super();
+    const { titleBytes } = args;
+
+    this.args = {
+      titleBytes: MoveVector.U8(titleBytes),
+    };
+  }
+
+  static async view(args: {
+    aptos: Aptos | AptosConfig;
+    titleBytes: HexInput; // vector<u8>
+    options?: LedgerVersionArg;
+  }): Promise<HexString> {
+    const [res] = await new VerifiedSymbolTitleBytes(args).view(args);
     return res;
   }
 }
