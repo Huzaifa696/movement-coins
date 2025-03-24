@@ -159,7 +159,7 @@ export type Types = {
       cumulativeSwaps: bigint;
       cumulativeChatMessages: bigint;
     };
-    marketsByEmojiBytes: Types["SmartTable"];
+    marketsByTitleBytes: Types["SmartTable"];
     marketsByMarketID: Types["SmartTable"];
     registryAddress: AccountAddressString;
     sequenceInfo: Types["SequenceInfo"];
@@ -169,7 +169,7 @@ export type Types = {
   MarketMetadata: {
     marketID: bigint;
     marketAddress: AccountAddressString;
-    emojiBytes: Uint8Array;
+    titleBytes: Uint8Array;
   };
 
   Reserves: {
@@ -349,7 +349,7 @@ export type Types = {
     cpammRealReservesQuote: number;
     lpCoinSupply: number;
     avgExecutionPriceQ64: number;
-    emojiBytes: `0x${string}`;
+    titleBytes: `0x${string}`;
     allTimeVolume: number;
     dailyVolume: number;
     tvlPerLpCoinGrowth: number;
@@ -440,8 +440,8 @@ export const toRegistryView = (data: JsonTypes["RegistryView"]): Types["Registry
 export const toMarketMetadata = (data: JsonTypes["MarketMetadata"]): Types["MarketMetadata"] => ({
   marketID: BigInt(data.market_id),
   marketAddress: standardizeAddress(data.market_address),
-  emojiBytes: hexToBytes(
-    data.emoji_bytes.startsWith("0x") ? data.emoji_bytes.slice(2) : data.emoji_bytes
+  titleBytes: hexToBytes(
+    data.title_bytes.startsWith("0x") ? data.title_bytes.slice(2) : data.title_bytes
   ),
 });
 
@@ -539,7 +539,7 @@ export const toRegistryResource = (data: JsonTypes["Registry"]): Types["Registry
       strToBigInt
     ),
   },
-  marketsByEmojiBytes: toSmartTable(data.markets_by_emoji_bytes),
+  marketsByTitleBytes: toSmartTable(data.markets_by_title_bytes),
   marketsByMarketID: toSmartTable(data.markets_by_market_id),
   registryAddress: standardizeAddress(data.registry_address),
   sequenceInfo: toParallelizableSequenceInfo(data.sequence_info),

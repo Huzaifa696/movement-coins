@@ -17,6 +17,8 @@ aptos move build-publish-payload \
 	--package-dir $move_dir/emojicoin_dot_fun/ \
 	--json-output-file $json_dir/emojicoin_dot_fun.json
 
+aptos tx submit --payload-file $json_dir/emojicoin_dot_fun.json
+
 # Note the extra `--skip-fetch-latest-git-deps` flag because the previous
 # command already fetches the latest git dependencies and the `rewards` module's
 # dependencies are a subset of the dependencies for `emojicoin_dot_fun`.

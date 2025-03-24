@@ -10,10 +10,12 @@ export const LaunchButtonOrGoToMarketLink = ({
   onWalletButtonClick,
   registered,
   invalid,
+  titleSlug,
 }: {
   onWalletButtonClick: () => void;
   registered?: boolean;
   invalid: boolean;
+  titleSlug?: string;
 }) => {
   const emojis = useEmojiPicker((state) => state.emojis);
   const { t } = translationFunction();
@@ -23,16 +25,21 @@ export const LaunchButtonOrGoToMarketLink = ({
     overflow: true,
   };
 
+  // Generate a URL path based on title slug if available, otherwise use emojis
+  const marketPath = titleSlug 
+    ? path.join(ROUTES.coin, titleSlug) 
+    : path.join(ROUTES.market, emojis.join(""));
+
   return (
     <>
       <ButtonWithConnectWalletFallback>
         {registered ? (
           <Link
             className="font-lora text-lg uppercase text-ec-blue"
-            href={path.join(ROUTES.market, emojis.join(""))}
+            href={marketPath}
           >
             <Button scale="lg" scrambleProps={scrambleProps}>
-              {t("Go to emojicoin market")}
+              {t("Go to market")}
             </Button>
           </Link>
         ) : (
@@ -43,7 +50,7 @@ export const LaunchButtonOrGoToMarketLink = ({
             style={{ cursor: invalid ? "not-allowed" : "pointer" }}
             scrambleProps={scrambleProps}
           >
-            {t(invalid ? "Invalid input" : "Launch Emojicoin")}
+            {t(invalid ? "Invalid input" : "Launch Coin")}
           </Button>
         )}
       </ButtonWithConnectWalletFallback>
