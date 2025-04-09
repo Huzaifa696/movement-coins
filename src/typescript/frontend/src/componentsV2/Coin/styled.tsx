@@ -10,7 +10,7 @@ export const HeaderContainer = styled.div`
 `;
 
 export const CoinTitle = styled.h1`
-  font-size: 64px;
+  font-size: 50px;
   font-weight: bold;
   color: white;
   margin-bottom: 16px;

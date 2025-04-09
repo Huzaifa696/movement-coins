@@ -49,7 +49,7 @@ const BalanceInfo = styled.div`
 const DetailBox = styled.div`
   display: flex;
   text-align: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 40px;
 `;
 
 const MatchBox = styled.div`
@@ -191,7 +191,7 @@ export default function SwapComponentV2({
       <DetailBox>
         <MatchBox className="match_box w-full px-4 py-2 rounded-full justify-between flex items-center mr-3 sm-mb-5">
           <h6 className="text-lg font-medium text-white text-center w-full">
-            {isSell ? t("You Deposit") : t("You Pay")} <br />
+            {isSell ? t("You Sell:") : t("You Deposit:")} <br />
             <InputNumeric
               className={inputAndOutputStyles + " bg-transparent leading-[32px] w-full text-center"}
               value={inputAmount}

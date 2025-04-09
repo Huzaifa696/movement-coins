@@ -28,7 +28,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ title, width, onClick = () => {} })
         width={width}
         maxWidth={width}
         textTransform="uppercase"
-        fontSize="24px"
+        fontSize="15px"
         ref={ref}
         fontFamily="Sifonn"
         // ellipsis

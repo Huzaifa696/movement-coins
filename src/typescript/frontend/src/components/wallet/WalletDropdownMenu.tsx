@@ -20,7 +20,7 @@ import { useAptos } from "context/wallet-context/AptosContextProvider";
 import { emoji } from "utils";
 import { Emoji } from "utils/emoji";
 
-const WIDTH = "24ch";
+const WIDTH = "auto";
 
 const WalletDropdownMenu = () => {
   const { t } = translationFunction();
@@ -38,18 +38,12 @@ const WalletDropdownMenu = () => {
 
   const { ref, replay } = useScramble({
     // text: text.startsWith("0x") ? `0x${text.slice(2).toUpperCase()}` : text.toUpperCase(),
-    text: "WALLET DISCONNECT",
+    text: t("WALLET DISCONNECT"),
     overdrive: false,
-    overflow: false,
-    speed: 0.6,
+    speed: 0.5,
     playOnMount: false,
-    onAnimationStart: () => setEnabled(false),
-    onAnimationEnd: () => setEnabled(true),
   });
 
-  const width = useMemo(() => {
-    return `${text.length + 8}ch`;
-  }, [text]);
 
   const handleReplay = (enabled: boolean, replay: () => void) => {
     if (enabled) replay();
@@ -63,14 +57,14 @@ const WalletDropdownMenu = () => {
       <DropdownMenu>
         <DropdownTrigger asChild className="focus:outline-none">
           <button className="" onMouseOver={() => handleReplay(enabled, replay)}>
-            <div className="flex flex-row text-ec-blue text-2xl">
+            <div className="flex flex-row text-ec-blue text-[15px]">
               {/* <Emoji
                 className="text-base flex mt-1.5 animate-flicker drop-shadow-voltage"
                 emojis={emoji("high voltage")}
               /> */}
               <p
-                className="whitespace-nowrap text-overflow-ellipsis overflow-hidden font-sifonn"
-                style={{ width, maxWidth: width, color: "#A562FF" }}
+                className="whitespace-nowrap text-overflow-ellipsis overflow-hidden font-sifonn font-[15px]"
+                style={{ width: WIDTH, maxWidth: WIDTH, color: "#A562FF" }}
                 ref={ref}
               />
               {/* <Emoji
