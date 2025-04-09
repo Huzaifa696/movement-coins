@@ -19,6 +19,9 @@ aptos move build-publish-payload \
 
 # Note the extra `--skip-fetch-latest-git-deps` flag because the previous
 # command already fetches the latest git dependencies and the `rewards` module's
+
+aptos tx submit --payload-file ./json/emojicoin_dot_fun.json
+
 # dependencies are a subset of the dependencies for `emojicoin_dot_fun`.
 aptos move build-publish-payload \
 	--assume-yes \
