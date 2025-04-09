@@ -40,7 +40,7 @@ export const WalletDropdownItem = ({
     >
       <motion.div whileTap={{ scale: 0.95 }} className="flex flex-row gap-2 items-center p-2">
         {icon}
-        <span ref={ref}>{scrambleText}</span>
+        <span ref={ref} className="text-[15px]">{scrambleText}</span>
         {children}
       </motion.div>
     </DropdownItem>

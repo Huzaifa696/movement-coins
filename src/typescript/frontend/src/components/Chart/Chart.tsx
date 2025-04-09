@@ -132,7 +132,7 @@ const Chart: React.FC<ChartProps> = ({ title, data, height = 300 }) => {
 
   return (
     <div
-      className="w-full bg-black rounded-lg p-4"
+      className="w-[60%] bg-black rounded-lg p-4"
       style={{ backgroundColor: "black", zIndex: 1000, border: "1px solid #1a1a1a" }}
     >
       <div className="flex flex-col space-y-4">

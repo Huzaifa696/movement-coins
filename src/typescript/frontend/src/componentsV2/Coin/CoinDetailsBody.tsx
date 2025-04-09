@@ -7,6 +7,7 @@ import ProgressBar from "./ProgressBar";
 import MarketCard from "./MarketCard";
 import SwapComponentV2 from "components/pages/emojicoin/components/trade-emojicoin/SwapComponentV2";
 import { type CoinsList } from "@prisma/client";
+import Image from "next/image";
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -50,15 +51,17 @@ const CoinDetailsBody = (props: GridProps & { coinDetails?: CoinsList | null }):
     <div className="container px-4">
       <ContentWrapper>
         <SideImageContainer>
-          <StyledImage
-            src={coinImage}
-            style={{
-              ...(props.coinDetails?.meta?.imageURL && {
-                clipPath: "circle(45%)",
-              }),
-              zIndex: 1,
-            }}
+        <div className="relative w-[205px] h-[205px] bg-white/10 rounded-full border-2 border-white shadow-[0px_17.5px_39.37px_0px_#00000026] backdrop-blur-[10.2px] z-[1]">
+          <Image
+            src={coinImage || ""}
+            alt={""}
+            width={160}
+            height={160}
+            className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  w-[160px] h-[160px] rounded-full border-2 border-white"
+            priority
           />
+        </div>
+
         </SideImageContainer>
 
         <MainContent>
@@ -71,23 +74,24 @@ const CoinDetailsBody = (props: GridProps & { coinDetails?: CoinsList | null }):
         </MainContent>
 
         <div className="w-full flex justify-center items-center px-10 sm-px-10 md:w-3/12 lg:w-3/12">
-          <StyledImage
-            src={nonProfitImage}
-            style={{
-              ...(props.coinDetails?.meta?.nonProfitImageURL && {
-                clipPath: "circle(45%)",
-              }),
-              zIndex: 1,
-            }}
+        <div className="relative w-[205px] h-[205px] bg-white/10 rounded-full border-2 border-white shadow-[0px_17.5px_39.37px_0px_#00000026] backdrop-blur-[10.2px] z-[1]">
+          <Image
+            src={nonProfitImage || ""}
+            alt={""}
+            width={160}
+            height={160}
+            className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  w-[160px] h-[160px] rounded-full border-2 border-white"
+            priority
           />
         </div>
-        <div className="flex negative-margin justify-end mb-5 px-2 md:px-0 w-full z-1">
+        </div>
+        <div className="flex negative-margin justify-end mb-5 px-6 md:px-0 w-full z-1">
           <span onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
             <StyledImage src="/images/coin/info.png" />
           </span>
         </div>
         {showInfo ? (
-          <div className="flex w-full flex-wrap px-2 md:px-0 items-center justify-end">
+          <div className="flex w-full flex-wrap px-6 md:px-0 items-center justify-end">
             <div className="box-show px-5 py-3 rounded-full max-content text-white">
               1% of every trade goes to {nonProfitName}
             </div>
