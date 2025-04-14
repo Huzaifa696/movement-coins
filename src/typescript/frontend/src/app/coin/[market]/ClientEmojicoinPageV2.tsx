@@ -11,6 +11,7 @@ import CoinDetailsBody from "componentsV2/Coin/CoinDetailsBody";
 import Chart from "components/Chart/Chart";
 import { useParams } from "next/navigation";
 import { formatEmojiNameThroughSlug } from "components/pages/home/components/emoji-table/utils";
+import CoinDetailsTxHistory from "componentsV2/Coin/CoinDetailsTxHistory";
 // import Chart from "@/components/Chart/Chart";
 
 const EVENT_TYPES: BrokerEvent[] = ["Chat", "PeriodicState", "Swap"];
@@ -172,7 +173,7 @@ const ClientEmojicoinPageV2 = (props: EmojicoinProps2) => {
         <CoinDetailsHeader coinDetails={props.data?.coinDetails ?? null} />
         <CoinDetailsBody data={props.data} coinDetails={props.data?.coinDetails ?? null} />
       </div>
-      <div className="container mx-auto px-4 mt-16">
+      <div className="container mx-auto px-4 mt-16 flex gap-[60px]">
         <Chart
           title={formatEmojiNameThroughSlug(name ?? "")}
           data={
@@ -187,6 +188,8 @@ const ClientEmojicoinPageV2 = (props: EmojicoinProps2) => {
           }
           height={400}
         />
+
+        <CoinDetailsTxHistory data={props.data} />
       </div>
     </>
   );
