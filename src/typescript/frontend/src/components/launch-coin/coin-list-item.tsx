@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Circle } from "lucide-react";
 import { StyledImage } from "components/image/styled";
 
 interface CoinListItemProps {
@@ -26,7 +25,7 @@ export function CoinListItem({
       case "pending":
         return "text-yellow-500";
       case "rejected":
-        return "text-red-500";
+        return "text-red";
       default:
         return "text-gray-500";
     }
@@ -76,8 +75,8 @@ export function CoinListItem({
   return (
     <div className="flex items-center justify-between p-6 bg-white/5 backdrop-blur-xl rounded-full border border-white mb-4">
       <div className="flex items-center gap-8">
-        <div className="relative">
-          <div className="w-[140px] h-[140px] rounded-full overflow-hidden">
+        <div className="relative p-3" style={{ borderRadius: "100%", border: "2px solid white" }}>
+          <div className="w-[130px] h-[130px] rounded-full overflow-hidden">
             <div className="w-full h-full bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 opacity-80">
               <Image
                 src={imageSrc}
@@ -88,9 +87,9 @@ export function CoinListItem({
               />
             </div>
           </div>
-          <div className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg">
+          {/* <div className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg">
             <div className="text-black font-bold text-sm">V.</div>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -109,12 +108,17 @@ export function CoinListItem({
 
           <div className="flex items-center gap-6 mt-2">
             <div className="flex items-center">
-              <StyledImage className="mr-3 w-5 h-5" src="/images/coin/Aptos_White 2.png" />
+              <StyledImage className="mr-3 w-8 h-8" src="/images/coin/Aptos_White 2.png" />
               <span className="text-sm text-white/90 font-medium">{aptAmount} APT</span>
             </div>
             <div className="flex items-center">
-              <Circle className="w-5 h-5 mr-2 text-white/50" />
-              <span className="text-sm text-white/90 font-medium">{xAptAmount} X APT</span>
+              <div
+                className="border border-white rounded-full p-1 px-2 mr-2"
+                style={{ borderRadius: "100%", borderWidth: "2px" }}
+              >
+                <StyledImage src="/images/launch/dollar-symbol.png" />
+              </div>
+              <span className="text-sm text-white/90 font-medium">{xAptAmount} APT</span>
             </div>
           </div>
         </div>
