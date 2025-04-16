@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import { StyledImage } from "components/image/styled";
 import { useRegisterMarket } from "components/pages/launch-emojicoin/hooks/use-register-market";
@@ -5,8 +6,14 @@ import ButtonWithConnectWalletFallback from "components/header/wallet-button/Con
 import { useMemo } from "react";
 import { MARKET_REGISTRATION_DEPOSIT } from "@sdk/const";
 import { useAptos } from "context/wallet-context/AptosContextProvider";
+import { useCallback, useState } from "react";
+import { updateCoin } from "app/actions/createCoin";
+import { CoinStatus } from "@prisma/client";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface CoinListItemProps {
+  coinId: string;
   status: "approved" | "pending" | "rejected";
   coinTitle: string;
   nonprofitLink: string;
@@ -15,22 +22,52 @@ interface CoinListItemProps {
   imageSrc?: string;
   meta: object;
   id: string;
+  showApproveAndRejectButtons?: boolean;
 }
 
+const CircularButton = ({
+  children,
+  onClick,
+  disabled,
+  loading = false,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled: boolean;
+  loading?: boolean;
+}) => {
+  return (
+    <button
+      className="bg-white text-black rounded-full w-[140px] h-[140px] font-bold text-2xl hover:bg-gray-50 transition-colors"
+      onClick={() => onClick?.()}
+      disabled={disabled || loading}
+    >
+      {loading ? (
+        <p className="font-bold text-xl hover:bg-gray-50 transition-colors">Updating..</p>
+      ) : (
+        children
+      )}
+    </button>
+  );
+};
 export function CoinListItem({
   id,
   meta,
+  coinId,
   status,
   coinTitle,
   nonprofitLink,
   aptAmount,
   xAptAmount,
   imageSrc = "/images/coin/coin-avatar.png",
+  showApproveAndRejectButtons = false,
 }: CoinListItemProps) {
   const { registerMarket, cost } = useRegisterMarket();
 
-  const { aptBalance, refetchIfStale } = useAptos();
+  const { aptBalance } = useAptos();
 
+  const router = useRouter();
+  const [loading, setLoading] = useState<"approve" | "reject" | "launch" | null>(null);
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
@@ -69,40 +106,84 @@ export function CoinListItem({
 
   const onLaunchClick = async () => {
     try {
-      const res = await registerMarket({ ...meta, id: id });
+      setLoading("launch");
+      await registerMarket({ ...meta, id: id } as any);
+      setLoading(null);
     } catch (error) {
       console.log("onLaunchClick error: ", error);
+      setLoading(null);
     }
   };
+
+  const onStatusChange = useCallback(
+    async (status: CoinStatus) => {
+      setLoading(status == CoinStatus.REJECTED ? "reject" : "approve");
+      const response = await updateCoin(coinId, { status });
+      if (response.success) {
+        toast.success("Coin status updated successfully");
+        router.refresh();
+      } else {
+        toast.error("Failed to update coin status");
+      }
+      setLoading(null);
+    },
+    [coinId, router]
+  );
 
   const getActionButton = (status: string) => {
     switch (status) {
       case "approved":
         return (
           <ButtonWithConnectWalletFallback>
-            <button
-              className="bg-slate-50 text-black rounded-full w-[140px] h-[140px] font-bold text-2xl hover:bg-gray-50 transition-colors disabled:text-gray-500 disabled:bg-gray-200 d"
+            <CircularButton
               onClick={onLaunchClick}
-              disabled={!sufficientBalance}
+              disabled={!sufficientBalance || loading != null}
+              loading={loading == "launch"}
             >
               {!sufficientBalance ? "Insufficient Balance" : "LAUNCH"}
-            </button>
+            </CircularButton>
           </ButtonWithConnectWalletFallback>
         );
       case "pending":
+        return <CircularButton disabled={true}>LAUNCH</CircularButton>;
+      case "rejected":
+        return <CircularButton disabled={loading != null}>TRY AGAIN</CircularButton>;
+      default:
+        return null;
+    }
+  };
+
+  const getApproveAndRejectButtons = (status: string) => {
+    switch (status) {
+      case "pending":
         return (
-          <button
-            className="bg-gray-200 text-gray-500 rounded-full w-[140px] h-[140px] font-bold text-2xl"
-            disabled
+          <CircularButton
+            disabled={loading != null}
+            loading={loading == "approve"}
+            onClick={() => onStatusChange(CoinStatus.APPROVED)}
           >
-            LAUNCH
-          </button>
+            APPROVE
+          </CircularButton>
+        );
+      case "approved":
+        return (
+          <CircularButton
+            disabled={loading != null}
+            loading={loading == "reject"}
+            onClick={() => onStatusChange(CoinStatus.REJECTED)}
+          >
+            REJECT
+          </CircularButton>
         );
       case "rejected":
         return (
-          <button className="bg-white text-black rounded-full w-[140px] h-[140px] font-bold text-2xl hover:bg-gray-50 transition-colors">
-            TRY AGAIN
-          </button>
+          <CircularButton
+            disabled={loading != null}
+            loading={loading == "approve"}
+            onClick={() => onStatusChange(CoinStatus.APPROVED)}
+          >
+            APPROVE
+          </CircularButton>
         );
       default:
         return null;
@@ -161,7 +242,7 @@ export function CoinListItem({
         </div>
       </div>
 
-      {getActionButton(status)}
+      {showApproveAndRejectButtons ? getApproveAndRejectButtons(status) : getActionButton(status)}
     </div>
   );
 }
