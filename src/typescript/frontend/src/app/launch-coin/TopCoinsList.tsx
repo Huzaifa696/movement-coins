@@ -18,11 +18,13 @@ export default function TopCoinsList({ coins }: { coins: CoinsList[]; loading: b
         {`All the coins you've submitted will appear here. it may take up to 24h for a coin to be
         analyzed and approved.`}
       </p>
-      {coins?.map((coin) => (
+      {coins?.filter(elem => elem.status !== "LAUNCHED").map((coin) => (
         <CoinListItem
-          key={coin.id}
+          key={coin.id + coin.status}
+          id={coin.id}
           status={(coin.status?.toLowerCase() as "approved" | "pending" | "rejected") ?? "pending"}
           coinTitle={coin.meta.title}
+          meta={coin.meta}
           nonprofitLink={coin.meta.nonProfitLink ?? ""}
           imageSrc={coin.meta.imageURL ?? ""}
           aptAmount={myBalance}

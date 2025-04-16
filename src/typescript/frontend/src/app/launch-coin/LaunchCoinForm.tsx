@@ -280,7 +280,7 @@ export default function LaunchCoinForm() {
       </div>
 
       {/* Gradient Background */}
-      <div className="absolute inset-0 flex justify-center items-center z-1">
+      <div className="absolute inset-0 flex justify-center items-center z-[-10]">
         <Image
           src="/images/launch/launchCoinBg.png"
           alt="Gradient Background"

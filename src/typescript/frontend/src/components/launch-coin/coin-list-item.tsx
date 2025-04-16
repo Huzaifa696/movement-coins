@@ -1,5 +1,10 @@
 import Image from "next/image";
 import { StyledImage } from "components/image/styled";
+import { useRegisterMarket } from "components/pages/launch-emojicoin/hooks/use-register-market";
+import ButtonWithConnectWalletFallback from "components/header/wallet-button/ConnectWalletButton";
+import { useMemo } from "react";
+import { MARKET_REGISTRATION_DEPOSIT } from "@sdk/const";
+import { useAptos } from "context/wallet-context/AptosContextProvider";
 
 interface CoinListItemProps {
   status: "approved" | "pending" | "rejected";
@@ -8,9 +13,13 @@ interface CoinListItemProps {
   aptAmount: number;
   xAptAmount: number;
   imageSrc?: string;
+  meta: object;
+  id: string;
 }
 
 export function CoinListItem({
+  id,
+  meta,
   status,
   coinTitle,
   nonprofitLink,
@@ -18,6 +27,10 @@ export function CoinListItem({
   xAptAmount,
   imageSrc = "/images/coin/coin-avatar.png",
 }: CoinListItemProps) {
+  const { registerMarket, cost } = useRegisterMarket();
+
+  const { aptBalance, refetchIfStale } = useAptos();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
@@ -44,13 +57,37 @@ export function CoinListItem({
     }
   };
 
+  const totalCost = useMemo(
+    () => (cost ? cost + Number(MARKET_REGISTRATION_DEPOSIT) : undefined),
+    [cost]
+  );
+
+  const sufficientBalance = useMemo(
+    () => (totalCost ? aptBalance >= totalCost : undefined),
+    [aptBalance, totalCost]
+  );
+
+  const onLaunchClick = async () => {
+    try {
+      const res = await registerMarket({ ...meta, id: id });
+    } catch (error) {
+      console.log("onLaunchClick error: ", error);
+    }
+  };
+
   const getActionButton = (status: string) => {
     switch (status) {
       case "approved":
         return (
-          <button className="bg-white text-black rounded-full w-[140px] h-[140px] font-bold text-2xl hover:bg-gray-50 transition-colors">
-            LAUNCH
-          </button>
+          <ButtonWithConnectWalletFallback>
+            <button
+              className="bg-slate-50 text-black rounded-full w-[140px] h-[140px] font-bold text-2xl hover:bg-gray-50 transition-colors disabled:text-gray-500 disabled:bg-gray-200 d"
+              onClick={onLaunchClick}
+              disabled={!sufficientBalance}
+            >
+              {!sufficientBalance ? "Insufficient Balance" : "LAUNCH"}
+            </button>
+          </ButtonWithConnectWalletFallback>
         );
       case "pending":
         return (

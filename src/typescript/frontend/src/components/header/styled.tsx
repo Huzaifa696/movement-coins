@@ -14,7 +14,7 @@ export const StyledContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: ${({ theme }) => theme.zIndices.header};
+  z-index: 100;
   width: 100vw;
 `;
 

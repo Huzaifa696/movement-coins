@@ -13,11 +13,14 @@ import {
   MARKET_REGISTRATION_GAS_ESTIMATION_NOT_FIRST,
 } from "@sdk/const";
 import { useEmojiPicker } from "context/emoji-picker-context";
-import { SYMBOL_EMOJI_DATA } from "@sdk/emoji_data";
+import { SYMBOL_EMOJI_DATA, SYMBOL_EMOJIS } from "@sdk/emoji_data";
 import { useNumMarkets } from "lib/hooks/queries/use-num-markets";
 import { useQuery } from "@tanstack/react-query";
 import { type AccountInfo } from "@aptos-labs/wallet-adapter-core";
-import { createCoin } from "app/actions/createCoin";
+import { createCoin, CreateCoinParams, setLastIndex, updateCoin } from "app/actions/createCoin";
+import { CoinStatus } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "router/routes";
 
 export const tryEd25519PublicKey = (account: AccountInfo) => {
   try {
@@ -29,6 +32,14 @@ export const tryEd25519PublicKey = (account: AccountInfo) => {
   }
 };
 
+const generateTitleSlug = (title: string | undefined) => {
+  if (!title) return "";
+  return title
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+};
+
 export const useRegisterMarket = () => {
   const emojis = useEmojiPicker((state) => state.emojis);
   const setIsLoadingRegisteredMarket = useEmojiPicker(
@@ -37,6 +48,9 @@ export const useRegisterMarket = () => {
   const clear = useEmojiPicker((state) => state.clear);
   const setPickerInvisible = useEmojiPicker((state) => state.setPickerInvisible);
   const { aptos, account, signThenSubmit } = useAptos();
+
+  const router = useRouter();
+
 
   const { data: numMarkets } = useNumMarkets();
 
@@ -99,10 +113,15 @@ export const useRegisterMarket = () => {
     nonProfitDescription: string;
     nonProfitImage: string;
     nonProfitLink: string;
+    id: string;
   }) => {
     if (!account) {
       return;
     }
+
+    const lastIndex = await setLastIndex();
+    const emojisFromEnum = Object.keys(SYMBOL_EMOJIS);
+    const emojiBytes = [SYMBOL_EMOJI_DATA.byEmoji(emojisFromEnum[lastIndex.data])!.bytes];
 
     // Set the picker invisible for the duration of the registration transaction.
     setPickerInvisible(true);
@@ -129,21 +148,36 @@ export const useRegisterMarket = () => {
 
     if (res && isUserTransactionResponse(res)) {
       // Call server action to create coin in database
-      const emojiSlug = emojis.map((e) => SYMBOL_EMOJI_DATA.byEmoji(e)!.name).join("-");
-      await createCoin({
-        data: res,
+      const emojiSlug = SYMBOL_EMOJI_DATA.byEmoji(emojisFromEnum[lastIndex.data])!.name;
+      // await createCoin({
+      //   data: res,
+      //   emojiSlug,
+      //   emojis: emojis.map((e) => SYMBOL_EMOJI_DATA.byEmoji(e)!.name),
+      //   meta: {
+      //     title: launchCoinData.title,
+      //     description: launchCoinData.description,
+      //     imageURL: launchCoinData.image,
+      //     nonProfitName: launchCoinData.nonProfitName,
+      //     nonProfitDescription: launchCoinData.nonProfitDescription,
+      //     nonProfitImageURL: launchCoinData.nonProfitImage,
+      //     nonProfitLink: launchCoinData.nonProfitLink,
+      //   },
+      // });
+
+      const coinData = {
+        data: res.data,
         emojiSlug,
-        emojis: emojis.map((e) => SYMBOL_EMOJI_DATA.byEmoji(e)!.name),
-        meta: {
-          title: launchCoinData.title,
-          description: launchCoinData.description,
-          imageURL: launchCoinData.image,
-          nonProfitName: launchCoinData.nonProfitName,
-          nonProfitDescription: launchCoinData.nonProfitDescription,
-          nonProfitImageURL: launchCoinData.nonProfitImage,
-          nonProfitLink: launchCoinData.nonProfitLink,
-        },
-      });
+        titleSlug: generateTitleSlug(launchCoinData.title),
+        emojis: [SYMBOL_EMOJI_DATA.byEmoji(emojisFromEnum[lastIndex.data])!.name],
+        status: CoinStatus.LAUNCHED,
+        creatorAddress: account?.address,
+      };
+
+      await updateCoin(launchCoinData.id, coinData);
+
+      router.push(`${ROUTES.coin}/${generateTitleSlug(launchCoinData.title)}`)
+
+      return true
 
       clear();
       // The event is parsed and added as a registered market in `event-store.ts`,

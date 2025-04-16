@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 interface CoinRowProps {
   id: number;
@@ -37,9 +38,9 @@ export default function CoinRow({ id, date, status, link }: CoinRowProps) {
       <div className={`text-xs ${statusStyles[status.toLowerCase()]}`}>{getStatusText(status)}</div>
       <div>
         {link ? (
-          <button className="flex items-center text-sm text-white hover:underline">
+          <Link href={link} className="flex items-center text-sm text-white hover:underline">
             {link} <ArrowRight className="ml-2 w-4 h-4" />
-          </button>
+          </Link>
         ) : (
           "-"
         )}

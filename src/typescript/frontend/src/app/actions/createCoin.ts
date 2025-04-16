@@ -124,16 +124,19 @@ export async function getAllCoins(): Promise<{
 
 export async function setLastIndex(): Promise<{
   success: boolean;
+  data: number;
   message?: string;
 }> {
+  let index = 0
   try {
     const config = await prisma.config.findFirst();
     if (!config) {
       await prisma.config.create({
         data: { lastIndex: 0 },
       });
-      return { success: true, message: "Config created successfully" };
+      return { success: true, message: "Config created successfully",  data: 0};
     }
+    index = config.lastIndex
     await prisma.config.update({
       where: { id: config?.id },
       data: { lastIndex: (config?.lastIndex ?? 0) + 1 },
@@ -141,5 +144,5 @@ export async function setLastIndex(): Promise<{
   } catch (error) {
     console.error("Failed to get last index:", error);
   }
-  return { success: true, message: "Last index set successfully" };
+  return { success: true, message: "Last index set successfully",  data: index};
 }

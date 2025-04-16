@@ -63,7 +63,6 @@ const CoinDetailsTxHistory = (props: TradeHistoryProps) => {
     /* eslint-disable react-hooks/exhaustive-deps */
     [props.data.swaps.length, swaps.length]
   );
-  console.log("~~sortedSwaps: ", sortedSwaps);
 
   return (
     <table className="relative flex flex-col table-fixed w-[40%] ">

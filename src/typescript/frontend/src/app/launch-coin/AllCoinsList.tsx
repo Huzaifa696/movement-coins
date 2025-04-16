@@ -7,9 +7,9 @@ export default function AllCoinsList({ coins, loading }: { coins: CoinsList[]; l
       return `/coin/${coin.titleSlug}`;
     }
 
-    if (coin.status === CoinStatus.APPROVED) {
-      return `/launch-coin`;
-    }
+    // if (coin.status === CoinStatus.APPROVED) {
+    //   return `/launch-coin`;
+    // }
 
     return undefined;
   };

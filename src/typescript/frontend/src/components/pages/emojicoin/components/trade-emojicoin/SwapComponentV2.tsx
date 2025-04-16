@@ -92,6 +92,7 @@ export default function SwapComponentV2({
   marketAddress,
   marketEmojis,
   initNumSwaps,
+  coinImage
 }: SwapComponentProps) {
   const { t } = translationFunction();
   const searchParams = useSearchParams();
@@ -200,7 +201,7 @@ export default function SwapComponentV2({
               decimals={8}
             />
           </h6>
-          <StyledImage src="/images/coin/Aptos_White 1.png" />
+          <StyledImage className="rounded-full" variant="circle" width={28} height={28} src={isSell ? coinImage  : "/images/coin/Aptos_White 1.png"} />
         </MatchBox>
         <MatchBox
           className="match_box w-max-content self-center px-4 py-2 rounded-full justify-between flex items-center mr-3 sm-mb-5"
@@ -232,6 +233,7 @@ export default function SwapComponentV2({
               decimals={OUTPUT_DISPLAY_DECIMALS}
             />
           </h6>
+          <StyledImage className="rounded-full" variant="circle" width={28} height={28} src={isSell ? "/images/coin/Aptos_White 1.png"   : coinImage} />
         </MatchBox>
       </DetailBox>
       {/* <GreenpeaceText>Project Zero’s Receives: 0.1</GreenpeaceText> */}
