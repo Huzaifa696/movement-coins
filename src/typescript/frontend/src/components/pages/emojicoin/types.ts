@@ -38,6 +38,7 @@ export interface SwapComponentProps {
   marketAddress: AccountAddressString;
   marketEmojis: SymbolEmoji[];
   initNumSwaps: number;
+  coinImage?: string;
 }
 export interface TradeHistoryProps {
   data: Omit<DataProps, "chats">;

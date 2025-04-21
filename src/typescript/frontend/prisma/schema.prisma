@@ -8,13 +8,22 @@ datasource db {
 }
 
 model CoinsList {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  data      Json?
-  titleSlug String   @unique
-  emojiSlug String   @unique
-  emojis    String[]
-  createdAt DateTime @default(now())
-  meta      Meta
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  data           Json?
+  titleSlug      String      @unique
+  emojiSlug      String      @unique
+  emojis         String[]
+  status         CoinStatus? @default(PENDING)
+  creatorAddress String?
+  createdAt      DateTime    @default(now())
+  meta           Meta
+}
+
+enum CoinStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  LAUNCHED
 }
 
 type Meta {
@@ -25,4 +34,11 @@ type Meta {
   nonProfitDescription String?
   nonProfitImageURL    String?
   nonProfitLink        String?
+}
+
+model Config {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  lastIndex Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

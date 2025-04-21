@@ -14,4 +14,5 @@ export const ROUTES = {
   dexscreener: "/dexscreener",
   coin: "/coin",
   newPool: "/new-pool",
+  launchCoin: "/launch-coin",
 } as const;

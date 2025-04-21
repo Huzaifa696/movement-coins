@@ -14,7 +14,7 @@ const ContentWrapper = styled.div`
   flex-wrap: wrap;
   margin-top: 4rem;
   position: relative;
-  z-index: 9999;
+  z-index: 15;
 `;
 
 const SideImageContainer = styled.div`
@@ -51,21 +51,21 @@ const CoinDetailsBody = (props: GridProps & { coinDetails?: CoinsList | null }):
     <div className="container px-4">
       <ContentWrapper>
         <SideImageContainer>
-        <div className="relative w-[205px] h-[205px] bg-white/10 rounded-full border-2 border-white shadow-[0px_17.5px_39.37px_0px_#00000026] backdrop-blur-[10.2px] z-[1]">
-          <Image
-            src={coinImage || ""}
-            alt={""}
-            width={160}
-            height={160}
-            className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  w-[160px] h-[160px] rounded-full border-2 border-white"
-            priority
-          />
-        </div>
-
+          <div className="relative w-[205px] h-[205px] bg-white/10 rounded-full border-2 border-white shadow-[0px_17.5px_39.37px_0px_#00000026] backdrop-blur-[10.2px] z-[1]">
+            <Image
+              src={coinImage || ""}
+              alt={""}
+              width={160}
+              height={160}
+              className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  w-[160px] h-[160px] rounded-full border-2 border-white"
+              priority
+            />
+          </div>
         </SideImageContainer>
 
         <MainContent>
           <SwapComponentV2
+            coinImage={coinImage}
             emojicoin={props.data.symbol}
             marketAddress={props.data.marketAddress}
             marketEmojis={props.data.symbolEmojis}
@@ -74,16 +74,16 @@ const CoinDetailsBody = (props: GridProps & { coinDetails?: CoinsList | null }):
         </MainContent>
 
         <div className="w-full flex justify-center items-center px-10 sm-px-10 md:w-3/12 lg:w-3/12">
-        <div className="relative w-[205px] h-[205px] bg-white/10 rounded-full border-2 border-white shadow-[0px_17.5px_39.37px_0px_#00000026] backdrop-blur-[10.2px] z-[1]">
-          <Image
-            src={nonProfitImage || ""}
-            alt={""}
-            width={160}
-            height={160}
-            className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  w-[160px] h-[160px] rounded-full border-2 border-white"
-            priority
-          />
-        </div>
+          <div className="relative w-[205px] h-[205px] bg-white/10 rounded-full border-2 border-white shadow-[0px_17.5px_39.37px_0px_#00000026] backdrop-blur-[10.2px] z-[1]">
+            <Image
+              src={nonProfitImage || ""}
+              alt={""}
+              width={160}
+              height={160}
+              className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  w-[160px] h-[160px] rounded-full border-2 border-white"
+              priority
+            />
+          </div>
         </div>
         <div className="flex negative-margin justify-end mb-5 px-6 md:px-0 w-full z-1">
           <span onClick={() => setShowInfo(!showInfo)} className="cursor-pointer">
