@@ -135,6 +135,10 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     const E_REMOVE_LIQUIDITY_QUOTE_AMOUNT_ZERO: u64 = 26;
     /// User does not have enough base for swap sell.
     const E_SWAP_NOT_ENOUGH_BASE: u64 = 27;
+    /// Market already exists at the given address.
+    const E_MARKET_ALREADY_EXISTS: u64 = 28;
+    /// Title is already taken by another market.
+    const E_TITLE_ALREADY_TAKEN: u64 = 29;
 
     /// Exists at package address, tracks the address of the registry object.
     struct RegistryAddress has key {
@@ -144,13 +148,20 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     #[resource_group = ObjectGroup]
     struct Registry has key {
         registry_address: address,
-        sequence_info: ParallelizableSequenceInfo,
-        coin_symbol_emojis: Table<vector<u8>, u8>,
-        supplemental_chat_emojis: Table<vector<u8>, u8>,
-        markets_by_emoji_bytes: SmartTable<vector<u8>, address>,
+        nonce: Aggregator<u64>,
+        last_bump_time: u64,
+        n_markets: u64,
+        cumulative_quote_volume: Aggregator<u128>,
+        total_quote_locked: Aggregator<u128>,
+        total_value_locked: Aggregator<u128>,
+        market_cap: Aggregator<u128>,
+        fully_diluted_value: Aggregator<u128>,
+        cumulative_integrator_fees: Aggregator<u128>,
+        cumulative_swaps: Aggregator<u64>,
+        cumulative_chat_messages: Aggregator<u64>,
+        markets_by_title_bytes: SmartTable<vector<u8>, address>,
         markets_by_market_id: SmartTable<u64, address>,
-        extend_ref: ExtendRef,
-        global_stats: GlobalStats,
+        admins: vector<address>,
     }
 
     #[resource_group = ObjectGroup]
@@ -363,7 +374,13 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     struct MarketMetadata has copy, drop, store {
         market_id: u64,
         market_address: address,
-        emoji_bytes: vector<u8>,
+        title_bytes: vector<u8>,
+        description_bytes: vector<u8>,
+        image_url_bytes: vector<u8>,
+        non_profit_name_bytes: Option<vector<u8>>,
+        non_profit_description_bytes: Option<vector<u8>>,
+        non_profit_image_url_bytes: Option<vector<u8>>,
+        non_profit_link_bytes: Option<vector<u8>>,
     }
 
     struct ParallelizableSequenceInfo has drop, store {
@@ -422,10 +439,44 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
 
     public entry fun register_market(
         registrant: &signer,
-        emojis: vector<vector<u8>>,
+        title_bytes: vector<u8>,
+        description_bytes: vector<u8>,
+        image_url_bytes: vector<u8>,
+        non_profit_name_bytes: vector<u8>,
+        non_profit_description_bytes: vector<u8>,
+        non_profit_image_url_bytes: vector<u8>,
+        non_profit_link_bytes: vector<u8>,
         integrator: address,
+        integrator_fee: u64,
     ) acquires Market, Registry, RegistryAddress {
-        register_market_inner(registrant, emojis, integrator, true);
+        let registry_ref = borrow_registry_ref();
+        let market_id = aggregator::read(&registry_ref.nonce);
+        let market_address = signer::address_of(registrant);
+        let market_signer = get_market_signer(market_address);
+        let market_extend_ref = get_market_extend_ref(market_address);
+
+        // Ensure market is not already registered
+        assert!(!exists<Market>(market_address), E_MARKET_ALREADY_EXISTS);
+
+        // Ensure title is not already taken
+        assert!(
+            !smart_table::contains(&registry_ref.markets_by_title_bytes, title_bytes),
+            E_TITLE_ALREADY_TAKEN
+        );
+
+        register_market_inner(
+            registrant, 
+            title_bytes, 
+            description_bytes, 
+            image_url_bytes, 
+            non_profit_name_bytes, 
+            non_profit_description_bytes, 
+            non_profit_image_url_bytes, 
+            non_profit_link_bytes, 
+            integrator, 
+            integrator_fee,
+            true
+        );
     }
 
     public entry fun swap<Emojicoin, EmojicoinLP>(
@@ -1129,6 +1180,19 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     }
 
     #[view]
+    public fun market_metadata_by_title_bytes(title_bytes: vector<u8>): Option<MarketMetadata>
+    acquires Market, Registry, RegistryAddress {
+        let registry_ref = borrow_registry_ref();
+        let markets_by_title_bytes_ref = &registry_ref.markets_by_title_bytes;
+        if (smart_table::contains(markets_by_title_bytes_ref, title_bytes)) {
+            let market_address = *smart_table::borrow(markets_by_title_bytes_ref, title_bytes);
+            option::some(borrow_global<Market>(market_address).metadata)
+        } else {
+            option::none()
+        }
+    }
+
+    #[view]
     public fun market_metadata_by_market_address(market_address: address): Option<MarketMetadata>
     acquires Market {
         if (exists<Market>(market_address)) {
@@ -1155,13 +1219,34 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
         u64,
         address,
         vector<u8>,
+        vector<u8>,
+        vector<u8>,
+        Option<vector<u8>>,
+        Option<vector<u8>>,
+        Option<vector<u8>>,
     ) {
         let MarketMetadata {
             market_id,
             market_address,
-            emoji_bytes,
+            title_bytes,
+            description_bytes,
+            image_url_bytes,
+            non_profit_name_bytes,
+            non_profit_description_bytes,
+            non_profit_image_url_bytes,
+            non_profit_link_bytes,
         } = metadata;
-        (market_id, market_address, emoji_bytes)
+        (
+            market_id,
+            market_address,
+            title_bytes,
+            description_bytes,
+            image_url_bytes,
+            non_profit_name_bytes,
+            non_profit_description_bytes,
+            non_profit_image_url_bytes,
+            non_profit_link_bytes,
+        )
     }
 
     #[view]
@@ -1593,22 +1678,35 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
 
     fun register_market_inner(
         registrant: &signer,
-        emojis: vector<vector<u8>>,
+        title_bytes: vector<u8>,
+        description_bytes: vector<u8>,
+        image_url_bytes: vector<u8>,
+        non_profit_name_bytes: vector<u8>, 
+        non_profit_description_bytes: vector<u8>,
+        non_profit_image_url_bytes: vector<u8>,
+        non_profit_link_bytes: vector<u8>,
         integrator: address,
+        integrator_fee: u64,
         publish_code: bool,
     ) acquires Market, Registry, RegistryAddress {
         let registry_ref_mut = borrow_registry_ref_mut();
 
-        // Verify well-formed emoji bytes.
-        let emoji_bytes = get_verified_symbol_emoji_bytes(registry_ref_mut, emojis);
-
         // Verify market is not already registered.
         let markets_by_emoji_bytes_ref = &registry_ref_mut.markets_by_emoji_bytes;
-        let already_registered = smart_table::contains(markets_by_emoji_bytes_ref, emoji_bytes);
+        let already_registered = smart_table::contains(markets_by_emoji_bytes_ref, title_bytes);
         assert!(!already_registered, E_ALREADY_REGISTERED);
 
         // Create the Market object and add it to the registry.
-        let (market_address, market_signer) = create_market(registry_ref_mut, emoji_bytes);
+        let (market_address, market_signer) = create_market(
+            registry_ref_mut, 
+            title_bytes, 
+            description_bytes, 
+            image_url_bytes, 
+            non_profit_name_bytes, 
+            non_profit_description_bytes, 
+            non_profit_image_url_bytes, 
+            non_profit_link_bytes
+        );
         let market_ref_mut = borrow_global_mut<Market>(market_address);
 
         // Trigger periodic state in case global state has lapsed.
@@ -2001,12 +2099,18 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
 
     inline fun create_market(
         registry_ref_mut: &mut Registry,
-        emoji_bytes: vector<u8>,
+        title_bytes: vector<u8>,
+        description_bytes: vector<u8>,
+        image_url_bytes: vector<u8>,
+        non_profit_name_bytes: vector<u8>,
+        non_profit_description_bytes: vector<u8>,
+        non_profit_image_url_bytes: vector<u8>,
+        non_profit_link_bytes: vector<u8>,
     ): (address, signer) {
         // Create market object.
         let registry_signer = object::generate_signer_for_extending(&registry_ref_mut.extend_ref);
         let markets_by_emoji_bytes_ref_mut = &mut registry_ref_mut.markets_by_emoji_bytes;
-        let market_constructor_ref = object::create_named_object(&registry_signer, emoji_bytes);
+        let market_constructor_ref = object::create_named_object(&registry_signer, title_bytes);
         let market_address = object::address_from_constructor_ref(&market_constructor_ref);
         let market_signer = object::generate_signer(&market_constructor_ref);
         let market_extend_ref = object::generate_extend_ref(&market_constructor_ref);
@@ -2016,11 +2120,47 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
         let integrator_fees = if (market_id == 1) 0 else (MARKET_REGISTRATION_FEE as u128);
 
         let time = timestamp::now_microseconds();
+
+        // Add to registry.
+        smart_table::add(
+            markets_by_emoji_bytes_ref_mut,
+            title_bytes,
+            market_address,
+        );
+        smart_table::add(
+            &mut registry_ref_mut.markets_by_market_id,
+            market_id,
+            market_address,
+        );
+        
+        // Create market at the market address.
         move_to(&market_signer, Market {
-            metadata : MarketMetadata {
+            metadata: MarketMetadata {
                 market_id,
                 market_address,
-                emoji_bytes,
+                title_bytes,
+                description_bytes,
+                image_url_bytes,
+                non_profit_name_bytes: if (vector::length(&non_profit_name_bytes) > 0) {
+                    option::some(non_profit_name_bytes)
+                } else {
+                    option::none()
+                },
+                non_profit_description_bytes: if (vector::length(&non_profit_description_bytes) > 0) {
+                    option::some(non_profit_description_bytes)
+                } else {
+                    option::none()
+                },
+                non_profit_image_url_bytes: if (vector::length(&non_profit_image_url_bytes) > 0) {
+                    option::some(non_profit_image_url_bytes)
+                } else {
+                    option::none()
+                },
+                non_profit_link_bytes: if (vector::length(&non_profit_link_bytes) > 0) {
+                    option::some(non_profit_link_bytes)
+                } else {
+                    option::none()
+                },
             },
             sequence_info: SequenceInfo {
                 last_bump_time: timestamp::now_microseconds(),
@@ -2079,9 +2219,6 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
                 }
             ),
         });
-        // Update registry.
-        smart_table::add(markets_by_emoji_bytes_ref_mut, emoji_bytes, market_address);
-        smart_table::add(&mut registry_ref_mut.markets_by_market_id, market_id, market_address);
 
         (market_address, market_signer)
     }
@@ -2129,7 +2266,7 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     ) {
         if (!exists<LPCoinCapabilities<Emojicoin, EmojicoinLP>>(market_address)) {
             assert!(valid_coin_types<Emojicoin, EmojicoinLP>(market_address), E_INVALID_COIN_TYPES);
-            let symbol = string::utf8(market_ref.metadata.emoji_bytes);
+            let symbol = string::utf8(market_ref.metadata.title_bytes);
 
             // Initialize emojicoin with fixed supply, throw away capabilities.
             let (burn_cap, freeze_cap, mint_cap) = coin::initialize<Emojicoin>(

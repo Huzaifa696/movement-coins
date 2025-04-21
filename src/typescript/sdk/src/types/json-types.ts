@@ -140,7 +140,7 @@ type JsonTypes = {
       cumulative_swaps: AggregatorSnapshot<Uint64String>;
       cumulative_chat_messages: AggregatorSnapshot<Uint64String>;
     };
-    markets_by_emoji_bytes: JsonTypes["SmartTable"];
+    markets_by_title_bytes: JsonTypes["SmartTable"];
     markets_by_market_id: JsonTypes["SmartTable"];
     registry_address: AccountAddressString;
     sequence_info: JsonTypes["ParallelizableSequenceInfo"];
@@ -150,7 +150,7 @@ type JsonTypes = {
   MarketMetadata: {
     market_id: Uint64String;
     market_address: AccountAddressString;
-    emoji_bytes: HexString;
+    title_bytes: HexString;
   };
 
   Reserves: {
