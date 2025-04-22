@@ -22,7 +22,11 @@ const HeaderComponent = (): JSX.Element => {
         <HeaderContent>
           <LogoContainer>
             <NavbarLogo href="/home">
-              <StyledImage src="/images/logo.svg" alt="logo" className="header-logo w-[10px] h-[10px]" />
+              <StyledImage
+                src="/images/logo.svg"
+                alt="logo"
+                className="header-logo w-[10px] h-[10px]"
+              />
             </NavbarLogo>
           </LogoContainer>
           <NavContainer>

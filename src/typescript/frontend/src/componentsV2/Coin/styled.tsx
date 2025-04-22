@@ -6,7 +6,7 @@ export const HeaderContainer = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
-  z-index: 9999;
+  z-index: 15;
 `;
 
 export const CoinTitle = styled.h1`

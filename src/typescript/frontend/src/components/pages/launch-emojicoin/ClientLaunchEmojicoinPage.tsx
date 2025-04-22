@@ -73,13 +73,13 @@ const ClientLaunchEmojicoinPage = () => {
         // the emojis we're referencing are always the static ones that were used to register the market.
         const { marketID, emojiBytes } = marketRegistrationEvent.marketMetadata;
         const { symbol } = symbolBytesToEmojis(emojiBytes);
-        const newPath = path.join(ROUTES.market, symbol);
+        const newPath = path.join(ROUTES.coin, symbol);
         try {
           router.push(newPath);
           router.refresh();
         } catch (e) {
           console.error("Failed to navigate to market page", e);
-          const pathWithMarketID = path.join(ROUTES.market, marketID.toString());
+          const pathWithMarketID = path.join(ROUTES.coin, marketID.toString());
           router.push(pathWithMarketID);
           router.refresh();
         }
@@ -110,7 +110,7 @@ const ClientLaunchEmojicoinPage = () => {
       setStage("loading");
 
       timeout = window.setTimeout(() => {
-        if (window.location.href.endsWith(ROUTES.launch)) {
+        if (window.location.href.endsWith(ROUTES.launchCoin)) {
           handleLoading();
         }
       }, LOADING_TIME);
@@ -119,7 +119,7 @@ const ClientLaunchEmojicoinPage = () => {
     return () => {
       // If the user navigates away, consider the animation as having been completed and cancel the rest
       // of the navigational animation orchestration.
-      if (!window.location.href.endsWith(ROUTES.launch)) {
+      if (!window.location.href.endsWith(ROUTES.launchCoin)) {
         window.clearTimeout(timeout);
       }
     };

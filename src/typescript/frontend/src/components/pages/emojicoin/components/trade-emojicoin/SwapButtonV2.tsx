@@ -95,7 +95,6 @@ export const SwapButtonV2 = ({
               },
             });
             const res = await aptos.waitForTransaction({ transactionHash: response.hash });
-            console.log("RES-------->", res);
           } catch (error) {
             console.error(error);
           }

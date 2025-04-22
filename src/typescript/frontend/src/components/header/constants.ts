@@ -6,5 +6,5 @@ export const NAVIGATE_LINKS = [
   // { title: "launch emojicoin", path: ROUTES.launch, width: "158px" },
   // { title: "docs", path: ROUTES.docs, width: "42px" },
   { title: "pool", path: ROUTES.newPool, width: "auto" },
-  { title: "start", path: ROUTES.home, width: "auto" },
+  { title: "launch", path: ROUTES.launchCoin, width: "auto" },
 ];
