@@ -113,7 +113,7 @@ export const useRegisterMarket = () => {
     nonProfitDescription: string;
     nonProfitImage: string;
     nonProfitLink: string;
-    id: string;
+    id?: string;
   }) => {
     if (!account) {
       return;
