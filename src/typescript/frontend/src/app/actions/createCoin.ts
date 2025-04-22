@@ -78,7 +78,7 @@ export async function getCoin(
 }
 
 export async function updateCoin(
-  coinId: string,
+  coinId: any,
   data: Prisma.CoinsListUpdateInput
 ): Promise<{ success: boolean; data: CoinsList | null; message?: string }> {
   try {
