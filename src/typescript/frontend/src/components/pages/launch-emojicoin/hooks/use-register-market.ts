@@ -165,7 +165,7 @@ export const useRegisterMarket = () => {
       // });
 
       const coinData = {
-        data: res.data,
+        data: res,
         emojiSlug,
         titleSlug: generateTitleSlug(launchCoinData.title),
         emojis: [SYMBOL_EMOJI_DATA.byEmoji(emojisFromEnum[lastIndex.data])!.name],
