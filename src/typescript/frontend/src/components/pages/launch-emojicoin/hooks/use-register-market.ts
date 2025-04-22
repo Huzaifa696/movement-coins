@@ -179,10 +179,10 @@ export const useRegisterMarket = () => {
 
       return true
 
-      clear();
-      // The event is parsed and added as a registered market in `event-store.ts`,
-      // we don't need to do anything here other than set the loading state.
-      setIsLoadingRegisteredMarket(true);
+      // clear();
+      // // The event is parsed and added as a registered market in `event-store.ts`,
+      // // we don't need to do anything here other than set the loading state.
+      // setIsLoadingRegisteredMarket(true);
     } else {
       // If the transaction fails or the user cancels the transaction, we unset the loading state
       // and set the picker visible.
